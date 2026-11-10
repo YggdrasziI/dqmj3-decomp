@@ -10,7 +10,7 @@ for every boundary. A boundary is a hypothesis until a unit on each side matches
 - `config/jpn/symbols.txt` comes from `tools/ctr/analyze.py` (2026-11-10): 34,058
   functions (332 Thumb), 14,995 data labels. 127 functions have control flow the
   analysis could not follow; their bounds are not trusted.
-- No `[[regions]]` and no string pools in `config/jpn/config.toml` yet.
+- No `[[regions]]` in `config/jpn/config.toml` yet; string pools below.
 
 ## Leads for the region map (step 4)
 
@@ -25,6 +25,23 @@ for every boundary. A boundary is a hypothesis until a unit on each side matches
 - Script bindings: `BattleScriptFunc.cpp` 0x0012D8E0-0x00148AE0 (140 functions),
   `FieldScriptFunc.cpp` 0x00251FE8-0x0025D0A0 (186 functions); bounds of the
   functions that pass the file name, not of the files.
+
+## String pools (2026-11-10)
+
+armcc 4.1 b921 puts strings that data refers to in mergeable `.conststring` /
+`.constwstring` sections (checked by compiling a table of `const char*` and
+`const wchar_t*` with the project's flags), and armlink merged each into one pool.
+Both are in `config.toml`:
+
+| Pool | Range | Evidence |
+|---|---|---|
+| `.conststring` | 0x007C1724-0x007C3D2E (0x260A) | the only long run of packed narrow strings that data points to: 319 ASCII strings, no padding, no duplicate, none the tail of another; 319 pointers, one to the start of each string, none from code. One more pointer (0x0082061C) points to the `r` that ends a string: of the 7 strings ending in `r`, armlink's rule (the last when read backwards, `tools/ctr/strpool.py`) picks `dmp_LightEnv.shadowSelector`, the one pointed to. |
+| `.constwstring` | 0x007CAB34-0x007CC0A2 (0x156E) | 168 UTF-16 strings (`rom:/data/Community/CommunityPrize.nut`, ...), packed, no duplicate, none the tail of another, each pointed to once at its start (167 from data, 1 from `.text`); 0xFF padding (armlink's fill) right before and after, so one section of its own. |
+
+Other strings in `.rodata` are 4-aligned with zero padding between them (compiler
+`.constdata`), or in small sections that 0xFF padding separates (for example many
+UTF-16 `rom:/data/...` paths at 0x007C4490-0x007C6900, one section each). The pools
+are not proven by a matched unit yet.
 
 ## Code order: runs sorted by mangled name (2026-11-10)
 

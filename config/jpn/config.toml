@@ -39,5 +39,22 @@ type = "bss"
 address = 0x00823EAC
 size = 0x25504
 
-# String pools (armlink-merged .conststring / .constwstring) and library
-# regions are not located yet. See notes/SPLITS.md.
+# String pools: armcc 4.1 b921 puts strings that data refers to in .conststring /
+# .constwstring (mergeable), which armlink merged into one pool each. Evidence in
+# notes/SPLITS.md: packed strings, no duplicates, none the tail of another, every
+# string pointed to by data at its start; the one pointer into a narrow string's
+# tail follows armlink's choice. See tools/ctr/strpool.py.
+
+[[string_pools]]
+section = ".conststring"
+address = 0x007C1724
+size = 0x260A
+char_size = 1
+
+[[string_pools]]
+section = ".constwstring"
+address = 0x007CAB34
+size = 0x156E
+char_size = 2
+
+# Library regions are not located yet (notes/SPLITS.md).
