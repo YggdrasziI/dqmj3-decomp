@@ -129,10 +129,18 @@ reference to a removed function from anywhere else is an error.
 
 **Calls to trivial functions were inlined** (`armlink --inline`). A `bl` to a function that consists of
 nothing but `bx lr` was replaced by `mov r0, r0`. A `bl` to a function that consists of one instruction and
-`bx lr` was replaced by that instruction. (Observed in New Super Mario Bros. 2; to be confirmed for this game.)
+`bx lr` was replaced by that instruction. (Observed in New Super Mario Bros. 2, and in this game:
+`SQCompiler::Compile` has `ldr r0, [r0, #0x8]` where the source calls `SQFuncState::GetStackSize`.)
 
 Nothing records which function was called, so this is not undone when splitting. Instead `prelink.py` applies
 the same replacement to the compiled object before objdiff sees it, and `link.py` applies it when linking.
+
+A trivial function that armlink inlined into every caller was then removed as unused, so the image has no
+body to read the replacement from. When it is defined in the caller's own object, the body is taken from
+there. Otherwise it is listed in `inlined_functions` of `config.toml` with its instruction (in this game:
+`SQFuncState::GetStackSize`, called from `squirrel/sqcompiler.cpp`, defined in `squirrel/sqfuncstate.cpp`).
+The linker then replaces calls to it with that instruction, refuses a name that `symbols.txt` gives an
+address, and checks that any object defining the function compiles it to exactly that body.
 
 **Tail calls were turned into fallthrough** (`armlink --tailreorder` and `--branchnop`). Where it could, the
 linker placed a function that is tail called directly behind its caller and replaced the `b` between them

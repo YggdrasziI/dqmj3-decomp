@@ -58,6 +58,20 @@ address = 0x007CAB34
 size = 0x156E
 char_size = 2
 
+# Functions armlink inlined into every caller (--inline) and then removed as unused,
+# with the one instruction of their body before `bx lr`. Calls to them are replaced
+# by that instruction (tools/ctr/linker.py), and the object that defines one must
+# compile it to exactly that body.
+#
+# SQFuncState::GetStackSize (squirrel/sqfuncstate.cpp): SQCompiler::Compile calls it
+# twice in the source and has `ldr r0, [r0, #0x8]` there (0x00170CD0, 0x00170E30);
+# none of the three functions of the image with that body is called by a bl, and two
+# of them are in vtables (GetStackSize is not virtual).
+
+[[inlined_functions]]
+symbol = "_ZN11SQFuncState12GetStackSizeEv"
+instruction = 0xE5900008
+
 # Static initializer table: 2,105 words at the end of .rodata, each the offset from
 # the word to an initializer function (+1 for Thumb). 2,103 point to the start of a
 # function in symbols.txt. Evidence in notes/SPLITS.md.

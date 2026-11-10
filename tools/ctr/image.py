@@ -90,6 +90,14 @@ class VersionConfig:
             StringPoolDef(p["section"], p["address"], p["size"], p.get("char_size", 1))
             for p in data.get("string_pools", [])
         ]
+        # Functions armlink inlined into every caller and then removed: name -> the
+        # one instruction of their body (before `bx lr`)
+        self.inlined_functions: Dict[str, int] = {}
+        for f in data.get("inlined_functions", []):
+            instruction = f["instruction"]
+            if not isinstance(instruction, int) or not 0 <= instruction <= 0xFFFFFFFF:
+                raise ValueError(f"{path}: instruction of {f['symbol']} is not a 32-bit word")
+            self.inlined_functions[f["symbol"]] = instruction
         init_array = data.get("init_array")
         self.init_array: Optional[InitArrayDef] = (
             InitArrayDef(init_array["address"], init_array["size"]) if init_array else None

@@ -92,12 +92,20 @@ def inline_call(image: Image, insn: int, target: int, target_thumb: bool) -> Opt
     text = image.config.section(".text")
     if not text.contains(target):
         return None
-    cond = arm.arm_cond(insn)
     body = image.u32(target)
     if body == arm.ARM_BX_LR:
-        return (cond << 28) | (arm.ARM_MOV_R0_R0 & 0x0FFFFFFF)
+        return (arm.arm_cond(insn) << 28) | (arm.ARM_MOV_R0_R0 & 0x0FFFFFFF)
     if target + 8 > text.end or image.u32(target + 4) != arm.ARM_BX_LR:
         return None
+    return inline_body(insn, body)
+
+
+def inline_body(insn: int, body: int) -> Optional[int]:
+    """
+    The instruction that replaces a call (`insn`) to a function whose body is `body`
+    followed by `bx lr`, or None if armlink keeps the call.
+    """
+    cond = arm.arm_cond(insn)
     body_cond = arm.arm_cond(body)
     # `mov r0, r0` was a tail call when armlink made this decision: a branch, which like
     # anything else that involves pc can not be moved to the call site.
@@ -138,6 +146,12 @@ class LinkContext:
             }
         except ValueError as e:
             raise LinkError(f"{config.path}: {e}") from None
+        for name in config.inlined_functions:
+            if symbols.find(name):
+                raise LinkError(
+                    f"{config.path}: {name} is listed in inlined_functions, but "
+                    f"{config.symbols_path} gives it an address"
+                )
 
     def lookup(self, name: str, unit: Optional[Unit] = None) -> Symbol:
         candidates = self.symbols.find(name)
@@ -182,7 +196,32 @@ class PlacedObject:
         self.placements: Dict[int, Placement] = {}
         # Sections left out because the original image does not have them
         self.removed: List[elf.Section] = []
+        self._check_inlined_functions()
         self._place()
+
+    def _check_inlined_functions(self) -> None:
+        """The compiled body of an inlined function must be the one config.toml gives."""
+        for sym in self.elf.symbols:
+            instruction = self.ctx.config.inlined_functions.get(sym.name)
+            if instruction is None or not sym.is_defined or sym.bind == elf.STB_LOCAL:
+                continue
+            body = struct.pack("<II", instruction, arm.ARM_BX_LR)
+            section = (
+                self.elf.sections[sym.shndx] if sym.shndx < len(self.elf.sections) else None
+            )
+            if (
+                section is None
+                or not section.is_code
+                or sym.type != elf.STT_FUNC
+                or sym.value & 1
+                or sym.size != len(body)
+                or section.data[sym.value : sym.value + len(body)] != body
+                or any(sym.value <= r.offset < sym.value + len(body) for r in section.relocs)
+            ):
+                raise LinkError(
+                    f"{self.path}: {sym.name} does not compile to the body that "
+                    f"inlined_functions in {self.ctx.config.path} gives it"
+                )
 
     def _is_candidate(self, section: elf.Section) -> bool:
         if not section.is_alloc or section.type not in (
@@ -348,7 +387,11 @@ class PlacedObject:
     def unplaced_empty_call(self, section: elf.Section, reloc: elf.Reloc) -> Optional[int]:
         """Inline a narrowly known helper removed by armlink's section elimination.
 
-        Unlike an unresolved external, its complete body is available in this object.
+        A function listed in inlined_functions of config.toml is the other case: it
+        is usually defined in another object, so its body comes from the config (and
+        is checked against the object that defines it, see _check_inlined_functions).
+
+        Otherwise the complete body must be available in this object.
         No image address is needed for the substitutions below. Address-taking
         and other nonempty bodies must still resolve normally. A second exact case models
         the local result-description accessor: one ``ldr r0, [r0, #4]`` followed by
@@ -364,13 +407,19 @@ class PlacedObject:
         if not arm.arm_is_bl(insn):
             return None
         sym = self.elf.symbols[reloc.symbol]
+        # Only a call to the entry itself is eligible, never a symbol-plus-offset.
+        target_offset = arm.sext(insn & 0x00FFFFFF, 24) * 4 + 8
+        instruction = self.ctx.config.inlined_functions.get(sym.name)
+        if instruction is not None and sym.bind != elf.STB_LOCAL:
+            # Declared in config.toml; its body is checked wherever it is defined
+            if target_offset != 0:
+                return None
+            return inline_body(insn, instruction)
         if (sym.type != elf.STT_FUNC or not sym.is_defined or sym.value & 1
                 or sym.shndx >= len(self.elf.sections) or sym.shndx in self.placements
                 or self.ctx.symbols.find(sym.name)):
             return None
         body = self.elf.sections[sym.shndx]
-        # Only a call to the entry itself is eligible, never a symbol-plus-offset.
-        target_offset = arm.sext(insn & 0x00FFFFFF, 24) * 4 + 8
         if sym.size == 4 and body.is_code and not body.relocs and target_offset == 0:
             if body.data[sym.value:sym.value + 4] == struct.pack("<I", arm.ARM_BX_LR):
                 return (arm.arm_cond(insn) << 28) | (arm.ARM_MOV_R0_R0 & 0x0FFFFFFF)
