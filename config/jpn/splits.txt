@@ -13,12 +13,15 @@ squirrel/sqapi.cpp:
 	.text       start:0x00154380 end:0x00154A24
 	.text       start:0x00155644 end:0x00155668
 	.text       start:0x001557FC end:0x001558FC
-	.text       start:0x00160EC8 end:0x001611B0
-	.text       start:0x001612A8 end:0x00161474
+	.text       start:0x00160EC8 end:0x00161474
+	.text       start:0x0016CC68 end:0x0016CC80
+	.text       start:0x0016CCC4 end:0x0016CCCC
 	.text       start:0x0016EC28 end:0x0016EED0
 	.text       start:0x001936D8 end:0x001937C0
 	.text       start:0x00194C20 end:0x00194C80
 	.text       start:0x00199CA0 end:0x00199CB4
+	.text       start:0x001A3694 end:0x001A3698
+	.text       start:0x0022E028 end:0x0022E038
 	.text       start:0x006AC984 end:0x006ACC00
 	.text       start:0x006ACC08 end:0x006AD40C
 	.text       start:0x006AD414 end:0x006AD824
@@ -50,6 +53,7 @@ squirrel/sqbaselib.cpp:
 	.text       start:0x001B5448 end:0x001B5510
 	.text       start:0x001B5A90 end:0x001B5CB0
 	.text       start:0x001B6790 end:0x001B69A8
+	.text       start:0x001B720C end:0x001B7310
 	.text       start:0x001B7760 end:0x001B789C
 	.text       start:0x005CAFE8 end:0x005CB0A4
 
@@ -57,7 +61,7 @@ squirrel/sqclass.cpp:
 	.text       start:0x00176FF0 end:0x00177420
 	.text       start:0x00188490 end:0x001884C0
 	.text       start:0x001905EC end:0x001906EC
-	.text       start:0x00197CA4 end:0x00197DC0
+	.text       start:0x00197CA4 end:0x001982E0
 	.text       start:0x0019B7C0 end:0x0019B8EC
 	.text       start:0x001C1B38 end:0x001C1B64
 	.text       start:0x001C1BEC end:0x001C1C50
@@ -66,11 +70,12 @@ squirrel/sqclass.cpp:
 
 squirrel/sqcompiler.cpp:
 	.text       start:0x00164414 end:0x001645A0
+	.text       start:0x0017BDD0 end:0x0017BE00
 	.text       start:0x00193910 end:0x00193968
 	.text       start:0x00194480 end:0x001945A8
 	.text       start:0x00199134 end:0x00199330
 	.text       start:0x0019D58C end:0x0019D890
-	.text       start:0x0019EE28 end:0x0019F0F0
+	.text       start:0x0019EDF4 end:0x0019F0F0
 	.text       start:0x001C174C end:0x001C1B38
 
 squirrel/sqdebug.cpp:
@@ -81,14 +86,13 @@ squirrel/sqdebug.cpp:
 squirrel/sqfuncstate.cpp:
 	.text       start:0x001885A0 end:0x00188814
 	.text       start:0x0019D890 end:0x0019D9F0
-	.text       start:0x0019DB7C end:0x0019DEE8
-	.text       start:0x0019DF48 end:0x0019DF78
+	.text       start:0x0019DB7C end:0x0019DF78
 	.text       start:0x0019F61C end:0x0019FDF0
-	.text       start:0x001A2050 end:0x001A2758
+	.text       start:0x001A2050 end:0x001A29B4
 	.text       start:0x0026BAA8 end:0x0026BD00
 
 squirrel/sqlexer.cpp:
-	.text       start:0x00177420 end:0x0017928C
+	.text       start:0x00177420 end:0x001792EC
 	.text       start:0x0019164C end:0x00191774
 	.text       start:0x00198E7C end:0x00198ED0
 	.text       start:0x001A16C0 end:0x001A18B8
@@ -97,7 +101,7 @@ squirrel/sqobject.cpp:
 	.text       start:0x0015E860 end:0x0015E91C
 	.text       start:0x00165BB0 end:0x001660F4
 	.text       start:0x001703A8 end:0x001704C8
-	.text       start:0x00187EA0 end:0x00187FC4
+	.text       start:0x00187E98 end:0x00187FC4
 	.text       start:0x00188814 end:0x00188B14
 	.text       start:0x00191E4C end:0x00191E64
 	.text       start:0x001946A4 end:0x00194734
@@ -122,9 +126,11 @@ squirrel/sqobject.cpp:
 	.text       start:0x00609CE8 end:0x00609D28
 
 squirrel/sqstate.cpp:
-	.text       start:0x00146364 end:0x0014818C
+	.text       start:0x00146364 end:0x001482A8
 	.text       start:0x001558FC end:0x00155B7C
 	.text       start:0x00162CF4 end:0x00162D70
+	.text       start:0x00165620 end:0x00165808
+	.text       start:0x001704C8 end:0x001706B8
 	.text       start:0x0017E9AC end:0x0017EA60
 	.text       start:0x00194C80 end:0x00194CA4
 	.text       start:0x00199CB4 end:0x00199D20
@@ -134,8 +140,7 @@ squirrel/sqstate.cpp:
 	.text       start:0x0022E21C end:0x0022E2AC
 
 squirrel/sqtable.cpp:
-	.text       start:0x00191774 end:0x001918AC
-	.text       start:0x001918D0 end:0x00191D7C
+	.text       start:0x00191774 end:0x00191DE8
 	.text       start:0x001982E0 end:0x00198404
 	.text       start:0x0019AD14 end:0x0019AF90
 	.text       start:0x0019EBD8 end:0x0019ED08
@@ -143,10 +148,10 @@ squirrel/sqtable.cpp:
 	.text       start:0x005CBABC end:0x005CBAE4
 
 squirrel/sqvm.cpp:
-	.text       start:0x001501A8 end:0x00150384
+	.text       start:0x001501A8 end:0x0015047C
 	.text       start:0x0015E3CC end:0x0015E458
 	.text       start:0x0016CC80 end:0x0016CCC4
-	.text       start:0x0016CCFC end:0x0016D14C
+	.text       start:0x0016CCF0 end:0x0016D14C
 	.text       start:0x00176BD8 end:0x00176DE8
 	.text       start:0x001837F8 end:0x00183958
 	.text       start:0x00188B14 end:0x00188C2C
@@ -156,4 +161,5 @@ squirrel/sqvm.cpp:
 	.text       start:0x001937C0 end:0x00193910
 	.text       start:0x001971D8 end:0x00197438
 	.text       start:0x0019774C end:0x00197CA4
+	.text       start:0x0019E9B0 end:0x0019EBD8
 	.text       start:0x00588B10 end:0x00588C88
