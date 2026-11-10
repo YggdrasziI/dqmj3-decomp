@@ -60,7 +60,17 @@ squirrel/sqbaselib.cpp:
 	.text       start:0x006AD40C end:0x006AD414
 	.text       start:0x006ADFC4 end:0x006ADFCC
 	.rodata     start:0x0076B3D4 end:0x0076B42B
-	.data       start:0x00820070 end:0x00820650
+	.data       start:0x00820070 end:0x00820190
+	.data       start:0x00820190 end:0x00820220
+	.data       start:0x00820220 end:0x00820320
+	.data       start:0x00820320 end:0x008203C0
+	.data       start:0x008203C0 end:0x00820420
+	.data       start:0x00820420 end:0x00820460
+	.data       start:0x00820460 end:0x008204F0
+	.data       start:0x008204F0 end:0x00820550
+	.data       start:0x00820550 end:0x008205C0
+	.data       start:0x008205C0 end:0x00820610
+	.data       start:0x00820610 end:0x00820650
 
 squirrel/sqclass.cpp:
 	.text       start:0x00176FF0 end:0x00177420
