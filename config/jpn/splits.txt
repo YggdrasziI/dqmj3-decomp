@@ -85,13 +85,15 @@ squirrel/sqclass.cpp:
 
 squirrel/sqcompiler.cpp:
 	.text       start:0x00164414 end:0x001645A0
+	.text       start:0x00170B88 end:0x00170F94
 	.text       start:0x0017BDD0 end:0x0017BE00
 	.text       start:0x00193910 end:0x00193968
 	.text       start:0x00194480 end:0x001945A8
-	.text       start:0x00199134 end:0x00199330
+	.text       start:0x00199134 end:0x00199B10
 	.text       start:0x0019D58C end:0x0019D890
 	.text       start:0x0019EDF4 end:0x0019F0F0
 	.text       start:0x001C174C end:0x001C1B38
+	.rodata     start:0x0074AF64 end:0x0074B058
 
 squirrel/sqdebug.cpp:
 	.text       start:0x0018E3C4 end:0x0018E704
