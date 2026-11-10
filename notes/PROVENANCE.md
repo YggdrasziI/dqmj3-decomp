@@ -38,6 +38,7 @@ Source: the owner's DQMJ2 decompilation (`YggdrasziI/dqmj2-decomp`, CC0-1.0), co
 | File | Purpose |
 |---|---|
 | `tools/disasm.py` | disassembly of functions of the original image, through objdiff-cli |
+| `tools/sweep_names.py` | names `symbols.txt` functions from a `compiler_sweep.py --json` result |
 
 ## Project documents
 

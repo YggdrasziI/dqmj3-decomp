@@ -20,8 +20,8 @@ for every boundary. A boundary is a hypothesis until a unit on each side matches
   as at 0x00660124) between functions.
 - Library strings (`notes/COMPILER.md`) give anchors: zlib near 0x0047AFF4,
   `nn::ac` near 0x001ABA78.
-- Functions found by the compiler sweeps (`notes/COMPILER.md`): Squirrel 2.2.5 (244),
-  zlib in 0x00695000-0x006B1000 (11).
+- Functions found by the compiler sweeps (`notes/COMPILER.md`): Squirrel 2.2.5 (224,
+  named in `symbols.txt`; spread over 0x00154000-0x006AE000, not one block), zlib in 0x00695000-0x006B1000 (11).
 - Script bindings: `BattleScriptFunc.cpp` 0x0012D8E0-0x00148AE0 (140 functions),
   `FieldScriptFunc.cpp` 0x00251FE8-0x0025D0A0 (186 functions); bounds of the
   functions that pass the file name, not of the files.
