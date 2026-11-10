@@ -21,6 +21,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT / "tools"))
 
+from ctr import elf  # noqa: E402
 from ctr.image import VersionConfig  # noqa: E402
 from ctr.symbols import Splits, SymbolTable  # noqa: E402
 from ctr.units import object_name, resolve_units  # noqa: E402
@@ -69,7 +70,9 @@ def main() -> None:
             rel = i.get("relocation")
             if rel is not None:
                 target = names[rel["target_symbol"]] if rel["target_symbol"] < len(names) else "?"
-                text = f"{text}    ; {rel['type_name']} {target}"
+                # objdiff-cli leaves out the name of some types (R_ARM_JUMP24)
+                kind = rel.get("type_name") or elf.RELOC_NAMES.get(rel.get("type"), f"type {rel.get('type')}")
+                text = f"{text}    ; {kind} {target}"
             if text.startswith(".word 0x"):
                 pool.append(int(text.split()[1], 16))
                 continue
