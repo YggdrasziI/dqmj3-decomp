@@ -66,8 +66,8 @@ everything else. Whether this game was laid out the same way is not checked yet.
 
 ## Compiler
 
-Not identified yet (`notes/COMPILER.md`). `configure.py` uses RVCT 4.1 build 894 and the flags BigRed found
-for New Super Mario Bros. 2 as placeholders.
+RVCT 4.1 build 921 with the flags BigRed found for New Super Mario Bros. 2, confirmed for this game by
+compiling Squirrel 2.2.5 and zlib 1.2.7 (`notes/COMPILER.md`).
 
 ## Splitting
 
@@ -195,6 +195,12 @@ never labelled.
 - `tools/project.py`: the report command runs through `cmd /s /c` on Windows, where ninja starts commands
   without a shell.
 - `tools/ctr/report_accounting.py`: the check of BigRed's total code size is removed.
+- `tools/project.py`: on Windows the compiler is started with a native path (`CreateProcess` does not
+  search a relative path written with `/`).
+- `tools/ctr/linker.py`: a data section whose only symbols are locals that `symbols.txt` does not know is
+  placed in the unit's free space, like a section without symbols. armcc puts each function's `__FUNCTION__`
+  string in a `.constdata` section with a local symbol named `__FUNCTION__`; such a string needs its `.rodata`
+  range claimed in `splits.txt` and no symbol at its address in `symbols.txt`.
 
 ## Known gaps
 

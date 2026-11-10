@@ -339,7 +339,8 @@ def generate_build_ninja(
                 unix(obj.src_path),
                 implicit=implicit,
                 variables={
-                    "armcc": armcc[obj.armcc_version],
+                    # CreateProcess does not search a relative path written with '/'
+                    "armcc": str(Path(armcc[obj.armcc_version])) if is_windows() else armcc[obj.armcc_version],
                     "cflags": " ".join(obj.cflags + include_dirs),
                 },
             )

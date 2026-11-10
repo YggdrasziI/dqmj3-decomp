@@ -5,8 +5,8 @@ for every boundary. A boundary is a hypothesis until a unit on each side matches
 
 ## Current state
 
-- `config/jpn/splits.txt` claims nothing yet: every byte belongs to an automatic unit
-  (`auto/<section>_<address>`, 64 KiB grid, see `notes/BUILD_SYSTEM.md`): 118 units.
+- `config/jpn/splits.txt` claims one unit; every other byte belongs to an automatic
+  unit (`auto/<section>_<address>`, 64 KiB grid, see `notes/BUILD_SYSTEM.md`).
 - `config/jpn/symbols.txt` comes from `tools/ctr/analyze.py` (2026-11-10): 34,058
   functions (332 Thumb), 14,995 data labels. 127 functions have control flow the
   analysis could not follow; their bounds are not trusted.
@@ -20,9 +20,14 @@ for every boundary. A boundary is a hypothesis until a unit on each side matches
   as at 0x00660124) between functions.
 - Library strings (`notes/COMPILER.md`) give anchors: zlib near 0x0047AFF4,
   `nn::ac` near 0x001ABA78.
+- Functions found by the compiler sweeps (`notes/COMPILER.md`): Squirrel 2.2.5 (244),
+  zlib in 0x00695000-0x006B1000 (11).
+- Script bindings: `BattleScriptFunc.cpp` 0x0012D8E0-0x00148AE0 (140 functions),
+  `FieldScriptFunc.cpp` 0x00251FE8-0x0025D0A0 (186 functions); bounds of the
+  functions that pass the file name, not of the files.
 
 ## Units
 
 | Unit | Range | Content | Status |
 |---|---|---|---|
-| — | — | — | — |
+| `game/FieldScriptFunc.cpp` | `.text` 0x002546FC-0x00254784, `.rodata` 0x00725800-0x0072580F | `SetFogDensity_` and its `__FUNCTION__` string | Matching (2026-11-10) |

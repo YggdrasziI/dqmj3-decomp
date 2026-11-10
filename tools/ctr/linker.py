@@ -233,7 +233,13 @@ class PlacedObject:
                         f"0x{base:08X} but {sym.name} puts it at 0x{candidate:08X}"
                     )
             if base is None:
-                if not syms and not shared:
+                # Data whose only symbols are locals the original has no name for
+                # (__FUNCTION__ strings: one per function, all with that name) is
+                # placed like data without a symbol.
+                anonymous = not syms or (
+                    not section.is_code and all(s.bind == elf.STB_LOCAL for s in syms)
+                )
+                if anonymous and not shared:
                     floating.append(section)
                     continue
                 # None of its symbols exist in the original: the linker removed it.

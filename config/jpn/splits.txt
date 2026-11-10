@@ -3,3 +3,7 @@ Sections:
 	.rodata     type:rodata align:4
 	.data       type:data align:4
 	.bss        type:bss align:4
+
+game/FieldScriptFunc.cpp:
+	.text       start:0x002546FC end:0x00254784
+	.rodata     start:0x00725800 end:0x0072580F
