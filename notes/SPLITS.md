@@ -158,8 +158,15 @@ named from their `__FUNCTION__` string):
   partial links) laid end to end.
 - A call-graph property as primary key (call height, number of callees, number of
   callers, ascending or descending, then the name) gives 98-200 runs: rejected.
-- armlink is not in decomp.me's `armcc.zip`, so the sort options (`--sort=...`) can
-  not be tried. Open.
+- `armlink --tailreorder` (`notes/BUILD_SYSTEM.md`) moves a tail-called function right
+  after its caller, out of its sorted place: 1,283 ARM functions end with the
+  `mov r0, r0` that replaced the branch and fall into the next one. Leaving those
+  callees out removes 3 breaks (26 to 23 runs): `sq_pop` -> `SQVM::Pop(int)`,
+  `sq_pushroottable` -> `SQVM::Push`, `sq_collectgarbage` ->
+  `SQSharedState::CollectGarbage`. So a unit's functions are not all contiguous: a
+  callee from another file can sit in the middle of a run.
+- armlink is not in decomp.me's `armcc.zip` (and RVCT 4.1 is not available), so the
+  sort options (`--sort=...`) can not be tried. The other breaks stay open.
 
 ## Units
 
