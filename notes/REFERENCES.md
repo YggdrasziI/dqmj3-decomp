@@ -44,5 +44,6 @@ first. Every reuse is logged in `notes/PROVENANCE.md`.
   compiler sweep (`notes/COMPILER.md`).
 - Squirrel 2.2.5 stable (zlib license, `squirrel_2.2.5_stable.tar.gz` from
   [SourceForge](https://sourceforge.net/projects/squirrel/files/squirrel2/)): the
-  game's scripting language; reference for the Squirrel units and API names. Used for
-  the compiler sweep.
+  game's scripting language. Copied into `libs/squirrel/` (approved by the owner for
+  Squirrel only; other zlib-licensed code still needs approval). Used for the compiler
+  sweep.

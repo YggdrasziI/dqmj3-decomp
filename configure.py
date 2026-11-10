@@ -119,8 +119,8 @@ config.scratch_compilers = {
 }
 
 # Base flags, common to most source files (from BigRed). Confirmed on Squirrel with
-# build 921: -O3 -Otime (244 functions; -O3 -Ospace 36, -O2 -Otime 53), --fpmode=fast
-# (243 without) and --signed_chars (235 without). --no_rtti made no difference.
+# build 921: -O3 -Otime (224 functions; -O3 -Ospace 30, -O2 -Otime 51), --fpmode=fast
+# (223 without) and --signed_chars (219 without). --no_rtti made no difference.
 cflags_base = [
     "--cpp",
     "--arm",
@@ -151,6 +151,22 @@ config.libs = [
             Object(Matching, "game/FieldScriptFunc.cpp"),
         ],
     },
+    {
+        # Squirrel 2.2.5 stable, unmodified public source (zlib license, libs/squirrel/COPYRIGHT).
+        # A unit claims only the functions the compiler sweep found byte for byte; the
+        # game's copy differs elsewhere (notes/COMPILER.md).
+        "lib": "squirrel",
+        "src_dir": "libs/squirrel",
+        "cflags": [*cflags_base, "--no_dep_name", "-Ilibs/squirrel/include"],
+        "progress_category": "lib",
+        "objects": [
+            Object(NonMatching, f"squirrel/{name}.cpp")
+            for name in (
+                "sqapi", "sqbaselib", "sqclass", "sqcompiler", "sqdebug", "sqfuncstate",
+                "sqlexer", "sqobject", "sqstate", "sqtable", "sqvm",
+            )
+        ],
+    },
 ]
 
 # Optional extra categories for progress tracking
@@ -161,6 +177,7 @@ config.progress_categories = [
     ProgressCategory("sdk", "Runtime and SDK"),
     ProgressCategory("nw", "NintendoWare"),
     ProgressCategory("net", "Network libraries"),
+    ProgressCategory("lib", "Other libraries"),
     ProgressCategory("unknown", "Unidentified"),
 ]
 

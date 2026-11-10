@@ -12,16 +12,28 @@ Google Inc., **Apache-2.0**, notice kept, license in `LICENSES/Apache-2.0.txt`).
 
 | Our file | Changes |
 |---|---|
-| `configure.py` | version `jpn` (`CTR-P-BJ3J`); no source objects; progress categories game / sdk / nw / net / unknown; progress image disabled; compiler and flags marked as placeholders |
+| `configure.py` | version `jpn` (`CTR-P-BJ3J`); own objects and libraries (`game`, `squirrel`); progress categories game / sdk / nw / net / lib / unknown; progress image disabled; compiler and flags marked as placeholders |
 | `tools/ctr/analyze.py` | after ARM code, a Thumb guess needs a Thumb `push` prologue (`is_thumb_prologue`) |
 | `tools/ctr/report_accounting.py` | BigRed's total code size check removed |
 | `tools/project.py` | report command chained through `cmd /s /c` on Windows; armcc started with a native path on Windows |
 | `tools/ctr/linker.py` | data sections with only unknown local symbols (`__FUNCTION__`) placed like sections without symbols |
+| `tools/ctr/prelink.py` | drops `R_ARM_NONE` relocations; renames template sections `t.<name>` to `i.<name>` |
 | `tools/download_tool.py` | generic User-Agent |
 | `tools/ctr/*.py`, `tools/progress_image.py` | `usa` → `jpn` in usage strings |
-| `tools/__init__.py`, `decompctx.py`, `ninja_syntax.py`, `tools/ctr/{arm,check,elf,image,link,prelink,split,strpool,symbols,units}.py` | none beyond the line above |
+| `tools/__init__.py`, `decompctx.py`, `ninja_syntax.py`, `tools/ctr/{arm,check,elf,image,link,split,strpool,symbols,units}.py` | none beyond the line above |
 | `notes/BUILD_SYSTEM.md` | from `docs/build_system.md`: NSMB2 facts removed or marked, changes of this project added |
 | `.editorconfig`, `.gitattributes`, `.clang-format`, `LICENSE` | none |
+
+## Squirrel 2.2.5
+
+Source: the public release `squirrel_2.2.5_stable.tar.gz` (SourceForge, SHA-1
+`a3d36da3ca4da5897df4d9ef93cc65ae09f1e3b4`), Copyright (c) 2003-2011 Alberto
+Demichelis, **zlib license** (`libs/squirrel/COPYRIGHT`, copy in
+`LICENSES/Zlib-Squirrel.txt`). Copied on 2026-11-10 with the owner's approval.
+
+| Our files | Changes |
+|---|---|
+| `libs/squirrel/include/squirrel.h`, `libs/squirrel/squirrel/*.{cpp,h}` | none (line endings normalized by git) |
 
 ## Scripts from DQMJ2
 

@@ -107,7 +107,8 @@ Evidence and the candidate analysis go in `notes/COMPILER.md`. How the build wor
 - Unknown classes and structs: `Unk<Name>` or `Unk<address>`; unknown methods keep the
   address (`fn_<addr>`, mangled as a member when the class is known).
 - Library code under `libs/<lib>/{include,src}` (`nn`, `nw`, `rvct`, `zlib`, `nex`,
-  `pia`, ...; each library sets its `src_dir` in `configure.py`), with the library's
+  `pia`, ...; each library sets its `src_dir` in `configure.py`; a public source copied
+  as is keeps its own layout, as `libs/squirrel/{include,squirrel}`), with the library's
   real names once identified by signature or a reference project. Starting point for
   `nn::`: zeldaret/3ds_sdk (CC0).
 - A unit's name in `splits.txt` is its source path relative to that `src_dir`
@@ -117,7 +118,8 @@ Evidence and the candidate analysis go in `notes/COMPILER.md`. How the build wor
 ## Layout
 
 ```
-README.md SPEC.md LICENSE LICENSES/   CC0-1.0; Apache-2.0 for tools/ninja_syntax.py
+README.md SPEC.md LICENSE LICENSES/   CC0-1.0; Apache-2.0 for tools/ninja_syntax.py;
+                                      zlib for libs/squirrel/ (notes/PROVENANCE.md)
 configure.py                          project description, generates build.ninja
 config/jpn/                           config.toml, symbols.txt, splits.txt
 orig/jpn/code.bin                     decompressed .code of the user's dump (git-ignored)
