@@ -27,8 +27,19 @@ jpn  | Japan, `CTR-P-BJ3J`, remaster version 0 | `0d9795cacac26c967390f02355dc40
 Progress
 ========
 
-Progress badges will be added with the first decompiled units. Current figures are in
-`notes/PROGRESS.md`.
+| Release | Game code | Progress |
+|---|---|---|
+| Dragon Quest Monsters: Joker 3 (Japan) | `CTR-P-BJ3J` | [![Fuzzy](progress/jpn/fuzzy.svg)](notes/PROGRESS.md) [![Perfect](progress/jpn/perfect.svg)](notes/PROGRESS.md) [![Linked](progress/jpn/linked.svg)](notes/PROGRESS.md) |
+
+[![Progress card](progress/jpn/card.svg)](notes/PROGRESS.md)
+
+- **Fuzzy**: objdiff fuzzy match score over all code.
+- **Perfect**: code that matches byte for byte.
+- **Linked**: code built from source (`Matching` units of `configure.py`).
+
+The badges and the card are drawn from the objdiff report by
+`tools/progress_badges.py`. After a build, `python tools/progress_badges.py --record`
+redraws `progress/jpn/` and adds the current commit to `progress/jpn/history.csv`.
 
 Dependencies
 ============

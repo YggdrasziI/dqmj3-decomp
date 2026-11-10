@@ -109,9 +109,9 @@ if "progress" in config.configure_args:
 config.wibo_tag = "1.2.0"
 config.objdiff_tag = "v3.8.2"
 
-# RVCT 4.1 build 921. Squirrel 2.2.5, compiled with the game, has 244 functions that
+# RVCT 4.1 build 921. Squirrel 2.2.5, compiled with the game, has 224 functions that
 # match with build 921; every other build of decomp.me's armcc.zip matches fewer
-# (1049, 1440, 1454: 240; 894: 234). The CTR-SDK's zlib needs 921 or later.
+# (1049, 1440, 1454: 221; 894: 218). The CTR-SDK's zlib needs 921 or later.
 # See notes/COMPILER.md.
 config.armcc_version = "4.1/b921"
 config.scratch_compilers = {
@@ -181,7 +181,7 @@ config.progress_categories = [
     ProgressCategory("unknown", "Unidentified"),
 ]
 
-config.progress_image_title = None  # badges are drawn by tools/progress_badges.py (step 3)
+config.progress_image_title = None  # badges are drawn by tools/progress_badges.py
 
 if args.mode == "configure":
     # Write build.ninja and objdiff.json

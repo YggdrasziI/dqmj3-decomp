@@ -43,6 +43,7 @@ Source: the owner's DQMJ2 decompilation (`YggdrasziI/dqmj2-decomp`, CC0-1.0), co
 | Our file | Changes |
 |---|---|
 | `tools/report_diff.py` | dsd gap units (`_dsd_gap@`) replaced by automatic units (`auto/`) |
+| `tools/progress_badges.py` | regions, modules and overlays replaced by the progress categories of the report; default report `build/<version>/tracker/report.json` |
 | `tools/compiler_sweep.py` | rewritten for armcc and `code.bin` (same purpose as DQMJ2's, which drove mwccarm); reads another project's objects and flags through its `configure.py` |
 
 ## Own scripts

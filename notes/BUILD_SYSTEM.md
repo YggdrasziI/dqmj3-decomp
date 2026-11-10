@@ -39,7 +39,7 @@ objdiff compares `build/jpn/delink/<unit>.o` (what the game contains) with `buil
 the source compiles to).
 
 The image stage (`tools/progress_image.py`) is disabled (`progress_image_title = None`); the README badges are
-drawn by `tools/progress_badges.py` instead (roadmap step 3).
+drawn by `tools/progress_badges.py` instead.
 
 Useful targets: `ninja` builds everything and prints progress, `ninja check` stops after verifying the image,
 `ninja split` only splits the original image.
