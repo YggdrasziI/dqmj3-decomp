@@ -98,9 +98,10 @@ squirrel/sqfuncstate.cpp:
 
 squirrel/sqlexer.cpp:
 	.text       start:0x00177420 end:0x001792EC
-	.text       start:0x0019164C end:0x00191774
+	.text       start:0x00190710 end:0x00191774
 	.text       start:0x00198E7C end:0x00198ED0
-	.text       start:0x001A16C0 end:0x001A18B8
+	.text       start:0x001A02F0 end:0x001A18B8
+	.rodata     start:0x0076B458 end:0x0076B484
 
 squirrel/sqobject.cpp:
 	.text       start:0x0015E860 end:0x0015E91C
