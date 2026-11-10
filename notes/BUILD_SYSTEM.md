@@ -201,6 +201,12 @@ never labelled.
   placed in the unit's free space, like a section without symbols. armcc puts each function's `__FUNCTION__`
   string in a `.constdata` section with a local symbol named `__FUNCTION__`; such a string needs its `.rodata`
   range claimed in `splits.txt` and no symbol at its address in `symbols.txt`.
+- `tools/ctr/prelink.py`: `R_ARM_NONE` relocations are dropped from the object objdiff reads. armcc emits them
+  against `_printf_*` so that armlink pulls in the format handlers a format string needs; they change no
+  bytes, the linker ignores them, and objdiff can not read them.
+- `tools/ctr/prelink.py`: armcc puts template instances in `t.<name>` sections, other functions in
+  `i.<name>`. Split objects only have `i.`, and objdiff pairs functions by section name, so `t.` is renamed
+  to `i.` in the object objdiff reads.
 
 ## Known gaps
 

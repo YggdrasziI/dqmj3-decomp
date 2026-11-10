@@ -27,6 +27,7 @@ from typing import Dict, List, Optional, Set
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
+from ctr import elf
 from ctr.image import Image, VersionConfig
 from ctr.linker import LinkContext, LinkError, PlacedObject, Placement
 from ctr.symbols import Splits, SymbolTable
@@ -106,6 +107,26 @@ def prepare_object(
             struct.pack_into("<I", data, section.offset + reloc.offset, 0)
             rel_index, entry = reloc.origin
             removed.setdefault(rel_index, set()).add(entry)
+
+    # R_ARM_NONE only tells armlink to pull in a library object (armcc emits them
+    # against _printf_* for format strings); they change no bytes, the linker
+    # ignores them, and objdiff can not read them
+    for section in obj.elf.sections:
+        for reloc in section.relocs or ():
+            if reloc.type == elf.R_ARM_NONE:
+                rel_index, entry = reloc.origin
+                removed.setdefault(rel_index, set()).add(entry)
+
+    # armcc puts template instances in "t.<name>" sections and other functions in
+    # "i.<name>"; split objects only have "i.", and objdiff pairs functions by
+    # section name. Both prefixes are as long, so the name is patched in place.
+    shstrndx = struct.unpack_from("<H", data, 0x32)[0]
+    shstr_offset = struct.unpack_from("<I", data, obj.elf.shoff + shstrndx * obj.elf.shentsize + 0x10)[0]
+    for section in obj.elf.sections:
+        if section.is_code and section.name.startswith("t."):
+            sh_name = struct.unpack_from("<I", data, obj.elf.shoff + section.index * obj.elf.shentsize)[0]
+            assert data[shstr_offset + sh_name : shstr_offset + sh_name + 2] == b"t."
+            data[shstr_offset + sh_name] = ord("i")
 
     # Drop the relocations of the calls that no longer exist
     for rel_index, entries in removed.items():
