@@ -17,6 +17,7 @@ import java.util.regex.Pattern;
 import ghidra.app.script.GhidraScript;
 import ghidra.program.model.address.Address;
 import ghidra.program.model.lang.Register;
+import ghidra.program.model.listing.ContextChangeException;
 import ghidra.program.model.listing.Function;
 import ghidra.program.model.listing.FunctionManager;
 import ghidra.program.model.listing.ProgramContext;
@@ -32,7 +33,7 @@ public class SyncSymbols extends GhidraScript {
     private static final Pattern ANALYSIS = Pattern.compile("^(fn|lbl)_[0-9A-F]{8}$");
 
     private boolean dry;
-    private int named, kept, created, thumb, labels;
+    private int named, kept, created, thumb, thumbConflicts, labels;
 
     @Override
     public void run() throws Exception {
@@ -57,8 +58,19 @@ public class SyncSymbols extends GhidraScript {
             }
             Address start = toAddr(Long.parseLong(m.group(3), 16));
             Address end = start.add(Math.max(size(m.group(4)), 2) - 1);
+            BigInteger current = context.getValue(tmode, start, false);
+            if (BigInteger.ONE.equals(current)) {
+                continue;
+            }
             if (!dry) {
-                context.setValue(tmode, start, end, BigInteger.ONE);
+                try {
+                    context.setValue(tmode, start, end, BigInteger.ONE);
+                } catch (ContextChangeException e) {
+                    // Already disassembled as ARM: leave it, report it
+                    thumbConflicts++;
+                    println("warning: Thumb range conflicts with instructions at " + start);
+                    continue;
+                }
             }
             thumb++;
         }
@@ -101,14 +113,21 @@ public class SyncSymbols extends GhidraScript {
                 }
             }
         }
-        println(String.format("%s%d Thumb ranges, %d functions created, %d labels created, "
-            + "%d names set, %d names typed in Ghidra kept", dry ? "(dry run) " : "", thumb,
+        println(String.format("%s%d Thumb ranges set (%d conflicts), %d functions created, %d labels created, "
+            + "%d names set, %d names typed in Ghidra kept", dry ? "(dry run) " : "", thumb, thumbConflicts,
             created, labels, named, kept));
     }
 
     private void apply(Symbol s, String name) throws Exception {
         if (s.getName().equals(name)) {
             return;
+        }
+        // Already there as a secondary symbol: Ghidra's demangler made a readable
+        // primary name from it; keep that one
+        for (Symbol other : currentProgram.getSymbolTable().getSymbols(s.getAddress())) {
+            if (other.getName().equals(name)) {
+                return;
+            }
         }
         boolean real = !ANALYSIS.matcher(name).matches();
         boolean ghidraDefault = s.getSource() == SourceType.DEFAULT
