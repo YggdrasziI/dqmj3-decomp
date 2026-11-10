@@ -31,31 +31,36 @@ squirrel/sqapi.cpp:
 
 squirrel/sqbaselib.cpp:
 	.text       start:0x00155668 end:0x001557FC
-	.text       start:0x001A9B18 end:0x001A9B64
-	.text       start:0x001A9D24 end:0x001AA114
-	.text       start:0x001AA210 end:0x001AA38C
-	.text       start:0x001AA6EC end:0x001AACF0
-	.text       start:0x001AACF4 end:0x001AAD24
-	.text       start:0x001AAF58 end:0x001AB1D4
+	.text       start:0x001A9B10 end:0x001A9B64
+	.text       start:0x001A9D24 end:0x001AA3A8
+	.text       start:0x001AA6EC end:0x001AAD24
+	.text       start:0x001AAF58 end:0x001AB1F0
 	.text       start:0x001AB430 end:0x001AB4E8
 	.text       start:0x001AB5D0 end:0x001AB820
 	.text       start:0x001AB8D8 end:0x001AB9CC
+	.text       start:0x001AC158 end:0x001AC388
+	.text       start:0x001AE8F4 end:0x001AE910
 	.text       start:0x001AEA70 end:0x001AEA90
 	.text       start:0x001AECC0 end:0x001AF890
 	.text       start:0x001AFC2C end:0x001AFCEC
-	.text       start:0x001B0924 end:0x001B0938
-	.text       start:0x001B098C end:0x001B09A8
-	.text       start:0x001B1444 end:0x001B1698
+	.text       start:0x001B0924 end:0x001B09A8
+	.text       start:0x001B1444 end:0x001B16DC
 	.text       start:0x001B2D90 end:0x001B2DB0
-	.text       start:0x001B3074 end:0x001B327C
-	.text       start:0x001B3AA4 end:0x001B3AE0
-	.text       start:0x001B3AF0 end:0x001B3B64
+	.text       start:0x001B3058 end:0x001B327C
+	.text       start:0x001B3AA4 end:0x001B3B78
 	.text       start:0x001B5448 end:0x001B5510
 	.text       start:0x001B5A90 end:0x001B5CB0
+	.text       start:0x001B63F8 end:0x001B640C
 	.text       start:0x001B6790 end:0x001B69A8
 	.text       start:0x001B720C end:0x001B7310
 	.text       start:0x001B7760 end:0x001B789C
 	.text       start:0x005CAFE8 end:0x005CB0A4
+	.text       start:0x006AC97C end:0x006AC984
+	.text       start:0x006ACC00 end:0x006ACC08
+	.text       start:0x006AD40C end:0x006AD414
+	.text       start:0x006ADFC4 end:0x006ADFCC
+	.rodata     start:0x0076B3D4 end:0x0076B42B
+	.data       start:0x00820070 end:0x00820650
 
 squirrel/sqclass.cpp:
 	.text       start:0x00176FF0 end:0x00177420

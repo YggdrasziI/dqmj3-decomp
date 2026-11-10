@@ -125,6 +125,21 @@ Other strings in `.rodata` are 4-aligned with zero padding between them (compile
 UTF-16 `rom:/data/...` paths at 0x007C4490-0x007C6900, one section each). The pools
 are not proven by a matched unit yet.
 
+### Squirrel's strings: a second `.conststring` block (2026-11-10)
+
+The names and type masks in `sqbaselib.cpp`'s delegate tables (`base_funcs`, `_table_default_delegate_funcz`
+...) are not in the pool above. 0x007C4031-0x007C421C holds Squirrel's strings, packed and **sorted by the
+string read backwards** (`.c`, `newthread`, `suspend`, `collectgarbage`, `getroottable`, ...: `c.` <
+`daerhtwen` < `dnepsus` < ...), the order tail merging produces. zlib's `z_errmsg` strings (`stream end` ...
+`insufficient memory`) come right before it, C++ library messages (`%s: bad locale name` ...) after it.
+Strings that exist earlier in the image are left out of the block and point there instead: `clear` is the
+tail of `judge_clear` (0x007B4606), `pop` of `apeal_pop` (0x007B4036), `t` is a game string at 0x007B3BDC,
+likewise `sort`, `top`, `an`, `x`. So armlink did not build one pool for the whole program: it looks like one
+merged, sorted block per library (or per group of objects), deduplicated against what was already placed.
+How the block of a string is chosen, and which copy of a duplicate wins, is open. `strpool.py` knows one
+pool per section name; until it knows more, `sqbaselib.cpp`'s `.data` scores 67 % (the 21 function
+pointers match, the string pointers do not resolve to the same symbols).
+
 ## Static initializer table (2026-11-10)
 
 `[init_array]` in `config.toml`: 0x007CC1F8-0x007CE2DC (0x20E4), the end of `.rodata`.
@@ -192,4 +207,5 @@ named from their `__FUNCTION__` string):
 | `squirrel/sqdebug.cpp` | 0x0018E3C4-0x0018E704, 0x00197438-0x0019774C, 0x006AE8CC-0x006AE9C4 | 7 functions (`SQVM::PrintObjVal`, both `SQVM::Raise_Error`, `Raise_IdxError`, `Raise_CompareError`, `Raise_ParamTypeError`, `sq_stackinfos`); `sq_getfunctioninfo` is not in the game (removed by armlink) | Matching (2026-11-10) |
 | `squirrel/sqstate.cpp` | 13 `.text` ranges, `.rodata` 0x007CE0B0-0x007CE0B4 (its `.init_array` entry), `.data` 0x008108F8-0x00810920 | 14 functions with `__sti___11_sqstate_cpp`, and `_null_`, `_true_`, `_false_`, `_one_`, `_minusone_` | Matching (2026-11-10) |
 | `squirrel/sqtable.cpp` | 8 `.text` ranges, `.rodata` 0x007A7E34-0x007A7E54 (`_ZTV7SQTable`) | 14 functions and the vtable; its slots named `SQTable::~SQTable` and `SQTable::Finalize`; `D0` is 0 in the original (removed) | Matching (2026-11-10) |
-| `squirrel/<file>.cpp` (9 other files, `libs/squirrel/`) | 125 `.text` ranges | the functions the sweep found, plus the functions named by the calls of matched code (`tools/reloc_names.py`) that compile to the same code | NonMatching: 223 of 229 at 100 % in objdiff with relocation targets compared; the 6 others refer to a long string literal (`.constdata`) or a vtable whose `.rodata` is not claimed yet. 13 named functions differ from the 2.2.5 source (game changes, not claimed): `sq_setparamscheck`, `SQClass::CreateInstance`, `SQCompiler::{Expression, PrefixedExpr, LogicalAndExp, Compile}`, `SQFuncState::~SQFuncState`, `SQArray::Extend`, `SQVM::{CallNative, Pop(), Push, ObjCmp, Execute}`; `SQLexer::Lex` waits for the unit's `.constdata` |
+| `squirrel/sqbaselib.cpp` | 31 `.text` ranges (without `array_sort` and `base_array`), `.rodata` 0x0076B3D4-0x0076B42B (`.constdata`), `.data` 0x00820070-0x00820650 (`base_funcs` and the 10 delegate tables, in source order) | 59 functions; 21 named from the delegate tables (the slot next to each name string, as for vtables), `sq_suspendvm` and `tolower` from their calls | NonMatching: all 59 at 100 %; not claimed, game variants `base_array` (98.6 %, the inlined `sqvector` resize loads its arguments in another order, like `SQArray::Extend`) and `array_sort` (89.3 %, swaps with `ldrd`/`strd` instead of VFP); `.data` 67 % (string pool, see above) |
+| `squirrel/<file>.cpp` (8 other files, `libs/squirrel/`) | 125 `.text` ranges | the functions the sweep found, plus the functions named by the calls of matched code (`tools/reloc_names.py`) that compile to the same code | NonMatching: 223 of 229 at 100 % in objdiff with relocation targets compared; the 6 others refer to a long string literal (`.constdata`) or a vtable whose `.rodata` is not claimed yet. 13 named functions differ from the 2.2.5 source (game changes, not claimed): `sq_setparamscheck`, `SQClass::CreateInstance`, `SQCompiler::{Expression, PrefixedExpr, LogicalAndExp, Compile}`, `SQFuncState::~SQFuncState`, `SQArray::Extend`, `SQVM::{CallNative, Pop(), Push, ObjCmp, Execute}` |
