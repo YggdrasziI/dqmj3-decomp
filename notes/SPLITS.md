@@ -91,6 +91,21 @@ CTR-SDK clients (`nn::ac`, `nn::cecd`), NEX and PIA, then CTR-SDK clients (`nn::
 matched unit proves them. Other service clients lie elsewhere: `ndm:u` 0x0010AFE0,
 `fs:USER` 0x001132B0, `dsp::DSP` 0x00121C20, `ir:USER` 0x0017FA48.
 
+### Start of `.text` (2026-11-10)
+
+`tools/link_density.py --core 0x100000-0x120000 --range 0x100000-0x140000 --group 48`:
+
+- 0x00100000-0x00103118: 0.03-0.06, but 3,648 links: code called from everywhere
+  (start-up and runtime helpers, many Thumb).
+- 0x00103120-0x00116E3C: 0.21-0.81, holds the `ndm:u` (0x0010AFE0) and `fs:USER`
+  (0x001132B0) clients: likely CTR-SDK code.
+- 0x00116EFC-0x0012E5C8: falls slowly (0.35 to 0.10), `dsp::DSP` client at 0x00121C20;
+  then 0.00-0.04 from 0x0012E65C (the `BattleScriptFunc.cpp` bindings, 0x0012D8E0).
+
+No sharp edge here, unlike the network block. The `ir:USER` client (0x0017FA48) lies
+inside a name-sorted run (0x0017BDD0-0x00186F4C): either some SDK code is sorted with
+the game, or that client is game code. Open.
+
 No `[[regions]]` from these: no bound is proven.
 
 ## String pools (2026-11-10)
