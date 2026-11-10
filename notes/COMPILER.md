@@ -29,7 +29,7 @@ word with a data relocation.
 
 ### Squirrel 2.2.5 (compiled with the game)
 
-`"Squirrel 2.2.5 stable"` at 0x00155C40. Source: the 2.2.5 stable release
+`"Squirrel 2.2.5 stable"` at 0x001557C0. Source: the 2.2.5 stable release
 (`squirrel_2.2.5_stable.tar.gz`, zlib license), the 11 files of `squirrel/`, flags of
 `configure.py` plus `--no_dep_name`. 385 functions compiled (383 with b921).
 
@@ -103,7 +103,7 @@ matches with 4.0 and 5.04).
 |---|---|
 | CTR-SDK | `nn::` error strings, e.g. `nn::ac::Initialize() failed` at 0x001ABA78 |
 | zlib 1.2.7 (SDK build) | version string at 0x0047AFF4; functions above |
-| Squirrel 2.2.5 | version string at 0x00155C40; 224 functions above |
+| Squirrel 2.2.5 | version string at 0x001557C0; 224 functions above |
 | NEX and PIA | `nn::nex::RootTransport` at 0x0074A596; `NN_PIA_SESSION_MAX_SILENCE_TIME_MAX` at 0x0073E509 |
 | NintendoWare for CTR | `battle_font_0.bflim` at 0x007B3988, `break_font.bffnt` at 0x007BDBB0, `Eft_Ptcl_PlaneXY.vsh` at 0x007535A6 |
 | Square Enix online library ("SIL") | `X-Sil-Version` at 0x0057918C, `dqmj3ds.sil2.square-enix.com` at 0x007BF80C |
