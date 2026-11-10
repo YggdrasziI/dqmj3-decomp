@@ -8,14 +8,14 @@ text{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,san
 </style>
 <rect class="bg" x="0.5" y="0.5" width="759" height="271" rx="6"/>
 <text class="t b" x="16" y="34">Dragon Quest Monsters: Joker 3 (jpn)</text>
-<text class="m" x="744" y="34" text-anchor="end">commit 64382fb</text>
+<text class="m" x="744" y="34" text-anchor="end">commit f8edcfd</text>
 <text class="t" x="16" y="60">Code</text>
 <rect class="track" x="186" y="49" width="300" height="12" rx="3"/>
 <rect class="fuzzy" x="186" y="49" width="4.2" height="12" rx="2"/>
-<rect class="perfect" x="186" y="49" width="4.2" height="12" rx="2"/>
+<rect class="perfect" x="186" y="49" width="3.2" height="12" rx="2"/>
 <rect class="linked" x="186" y="49" width="1.0" height="12" rx="2"/>
-<text class="t" x="674" y="60" text-anchor="end">88,068 / 6,310,790 bytes</text>
-<text class="m" x="744" y="60" text-anchor="end">1.40 %</text>
+<text class="t" x="674" y="60" text-anchor="end">67,428 / 6,310,790 bytes</text>
+<text class="m" x="744" y="60" text-anchor="end">1.07 %</text>
 <text class="t" x="16" y="86">Data</text>
 <rect class="track" x="186" y="75" width="300" height="12" rx="3"/>
 <rect class="fuzzy" x="186" y="75" width="1.0" height="12" rx="2"/>
@@ -25,11 +25,11 @@ text{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,san
 <text class="m" x="744" y="86" text-anchor="end">0.00 %</text>
 <text class="t" x="16" y="112">Functions</text>
 <rect class="track" x="186" y="101" width="300" height="12" rx="3"/>
-<rect class="fuzzy" x="186" y="101" width="2.0" height="12" rx="2"/>
-<rect class="perfect" x="186" y="101" width="2.0" height="12" rx="2"/>
+<rect class="fuzzy" x="186" y="101" width="1.9" height="12" rx="2"/>
+<rect class="perfect" x="186" y="101" width="1.9" height="12" rx="2"/>
 <rect class="linked" x="186" y="101" width="1.0" height="12" rx="2"/>
-<text class="t" x="674" y="112" text-anchor="end">225 / 34,057</text>
-<text class="m" x="744" y="112" text-anchor="end">0.66 %</text>
+<text class="t" x="674" y="112" text-anchor="end">218 / 34,057</text>
+<text class="m" x="744" y="112" text-anchor="end">0.64 %</text>
 <text class="t b" x="16" y="146">Code by category</text>
 <text class="t" x="16" y="172">Game</text>
 <rect class="track" x="186" y="161" width="300" height="12" rx="3"/>
@@ -41,9 +41,9 @@ text{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,san
 <text class="t" x="16" y="198">Other libraries</text>
 <rect class="track" x="186" y="187" width="300" height="12" rx="3"/>
 <rect class="fuzzy" x="186" y="187" width="300.0" height="12" rx="2"/>
-<rect class="perfect" x="186" y="187" width="300.0" height="12" rx="2"/>
-<text class="t" x="674" y="198" text-anchor="end">87,932 / 87,932 bytes</text>
-<text class="m" x="744" y="198" text-anchor="end">100.00 %</text>
+<rect class="perfect" x="186" y="187" width="229.6" height="12" rx="2"/>
+<text class="t" x="674" y="198" text-anchor="end">67,292 / 87,932 bytes</text>
+<text class="m" x="744" y="198" text-anchor="end">76.53 %</text>
 <text class="t" x="16" y="224">Not attributed yet</text>
 <rect class="track" x="186" y="213" width="300" height="12" rx="3"/>
 <text class="t" x="674" y="224" text-anchor="end">0 / 6,222,722 bytes</text>
