@@ -26,6 +26,31 @@ for every boundary. A boundary is a hypothesis until a unit on each side matches
   `FieldScriptFunc.cpp` 0x00251FE8-0x0025D0A0 (186 functions); bounds of the
   functions that pass the file name, not of the files.
 
+## Network libraries (NEX, PIA): leads (2026-11-10)
+
+Functions that reference a library-specific string (inline literal pool or `.rodata`):
+
+| Marker | Functions | Range |
+|---|---|---|
+| NEX (`NEX_3_9_1` version string, `Nex*` classes) | 9 | 7 in 0x0040A16C-0x004676B0, plus 0x005DD228 and 0x005DEBEC |
+| PIA (`pia sync heap`, `Pia ReceiveThreadStream`, `NatTraverser::`, `RelayRouteManager::`, `Local*Job::`) | 12 | 11 in 0x00457E54-0x0049B6DC, plus 0x00633398 |
+| zlib (`inflate`/`deflate` messages) | 4 | 0x0069D6C0-0x006A51E4 |
+
+- Functions that name themselves (`Class::Method` strings, 58 in all `.text`) are all in
+  0x0045A168-0x00499C58 and are **not** in mangled-name order
+  (`NatTraverser::stopNatSession` before `NatTraverser::startNatPortDetection`; 3 of 7
+  pairs ascend in another cluster), unlike the game runs below. Hypothesis: PIA (and
+  NEX) are prebuilt archives whose objects keep their own order.
+- No known name (game, Squirrel, runtime) lies in 0x003018C8-0x005889F4; the NEX/PIA
+  markers are inside that gap.
+- Calls (ARM `BL`) from 0x00450000-0x004A0000 go mostly to themselves; their outside
+  targets cluster in 0x005B0000, 0x00620000-0x00630000 and 0x00160000. Calls into it
+  come mostly from 0x005D0000, 0x00620000 and 0x00630000. So the network code is not
+  one block either, or the blocks at 0x005B/0x0062/0x0063 are other library parts. Not
+  resolved.
+
+No `[[regions]]` from these: no bound is proven.
+
 ## String pools (2026-11-10)
 
 armcc 4.1 b921 puts strings that data refers to in mergeable `.conststring` /
