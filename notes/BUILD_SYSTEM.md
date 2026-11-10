@@ -205,6 +205,9 @@ never labelled.
   `objdiff-cli report generate` ignores relocation targets (`none`), unlike `objdiff-cli diff` and the
   objdiff GUI: a function that calls `fn_0016CCF0` where ours calls `SQVM::GetAt` counted as a match. With
   the option a function only matches when its calls and references go to the same names.
+- `tools/ctr/report_accounting.py`: a data object inside `.text` (`type:object`, such as a table between
+  functions) is listed by objdiff with the functions; it is counted for its whole size instead of failing the
+  report.
 - `tools/ctr/split.py`, `tools/ctr/image.py`: the static initializer table (`[init_array]` in `config.toml`)
   is split into `.init_array` sections, as armcc emits them: one word of 0 per entry with an `R_ARM_TARGET1`
   relocation against the initializer (`__sti___<n>_<file>`). armlink wrote the offset from the entry to the

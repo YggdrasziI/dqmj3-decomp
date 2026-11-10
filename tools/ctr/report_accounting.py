@@ -31,14 +31,19 @@ def normalize(report, config):
         fuzzy = 0.0
         for function in functions:
             symbol = native[function['name']]
-            assert symbol.is_function and symbol.size, function['name']
-            info = splitter.analyzer.analyze(symbol.address, symbol.end, symbol.thumb)
-            end = symbol.end
-            while end - 4 >= symbol.address and end - 4 in info.ldr_pool:
-                end -= 4
-            if (symbol.thumb and end < symbol.end and end - 2 >= symbol.address
-                    and end - 2 not in info.code and splitter.image.u16(end - 2) == 0):
-                end -= 2
+            assert symbol.size, function['name']
+            if symbol.is_function:
+                info = splitter.analyzer.analyze(symbol.address, symbol.end, symbol.thumb)
+                end = symbol.end
+                while end - 4 >= symbol.address and end - 4 in info.ldr_pool:
+                    end -= 4
+                if (symbol.thumb and end < symbol.end and end - 2 >= symbol.address
+                        and end - 2 not in info.code and splitter.image.u16(end - 2) == 0):
+                    end -= 2
+            else:
+                # Data inside .text (a table between functions): objdiff lists it with
+                # the functions; it counts for its whole size
+                end = symbol.end
             weight = end - symbol.address
             function.setdefault('metadata', {})['code_accounting_size'] = weight
             total += weight
