@@ -141,11 +141,14 @@ squirrel/sqstate.cpp:
 
 squirrel/sqtable.cpp:
 	.text       start:0x00191774 end:0x00191DE8
+	.text       start:0x00194688 end:0x001946A4
 	.text       start:0x001982E0 end:0x00198404
 	.text       start:0x0019AD14 end:0x0019AF90
 	.text       start:0x0019EBD8 end:0x0019ED08
 	.text       start:0x005CB928 end:0x005CBA14
 	.text       start:0x005CBABC end:0x005CBAE4
+	.text       start:0x005CBAE4 end:0x005CBBD0
+	.rodata     start:0x007A7E34 end:0x007A7E54
 
 squirrel/sqvm.cpp:
 	.text       start:0x001501A8 end:0x0015047C
