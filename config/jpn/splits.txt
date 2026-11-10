@@ -1,0 +1,5 @@
+Sections:
+	.text       type:code align:4
+	.rodata     type:rodata align:4
+	.data       type:data align:4
+	.bss        type:bss align:4

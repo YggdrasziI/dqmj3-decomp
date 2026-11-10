@@ -1,0 +1,43 @@
+# Dragon Quest Monsters: Joker 3 (Japan), product code CTR-P-BJ3J,
+# title ID 000400000016AD00, remaster version 0, internal name "break".
+name = "dqmj3"
+version = "jpn"
+
+# Decompressed ExeFS .code (ctrtool --exefsdir=... --decompresscode)
+object = "orig/jpn/code.bin"
+hash = "0d9795cacac26c967390f02355dc409132227553"
+
+symbols = "config/jpn/symbols.txt"
+splits = "config/jpn/splits.txt"
+
+# Segment layout from the extended header (exheader.bin, SHA-1
+# dd5ad9e5bce006492aa449837f8b2a2594bfdee0).
+# The file offset of a section is its address minus the address of .text.
+# .bss follows the data segment directly: 0x007CF000 + 0x54EAC.
+
+[[sections]]
+name = ".text"
+type = "code"
+address = 0x00100000
+size = 0x61E34C
+
+[[sections]]
+name = ".rodata"
+type = "rodata"
+address = 0x0071F000
+size = 0xAF2DC
+
+[[sections]]
+name = ".data"
+type = "data"
+address = 0x007CF000
+size = 0x54EAC
+
+[[sections]]
+name = ".bss"
+type = "bss"
+address = 0x00823EAC
+size = 0x25504
+
+# String pools (armlink-merged .conststring / .constwstring) and library
+# regions are not located yet. See notes/SPLITS.md.

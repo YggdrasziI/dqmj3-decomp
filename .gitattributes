@@ -1,0 +1,13 @@
+# Auto detect text files and perform LF normalization
+* text=auto
+
+# Explicitly declare text files
+*.py   text
+
+# Enforce platform-specific encodings
+*.bat  text eol=crlf
+*.sh   text eol=lf
+
+# The tools write these files with LF
+config/**/*.txt   text eol=lf
+config/**/*.toml  text eol=lf
