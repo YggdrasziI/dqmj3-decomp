@@ -109,15 +109,18 @@ if "progress" in config.configure_args:
 config.wibo_tag = "1.2.0"
 config.objdiff_tag = "v3.8.2"
 
-# Not identified yet (roadmap step 2). RVCT 4.1 build 894 is a placeholder taken
-# from New Super Mario Bros. 2 (BigRed); nothing in this game confirms it.
-config.armcc_version = "4.1/b894"
+# RVCT 4.1 build 921. Squirrel 2.2.5, compiled with the game, has 244 functions that
+# match with build 921; every other build of decomp.me's armcc.zip matches fewer
+# (1049, 1440, 1454: 240; 894: 234). The CTR-SDK's zlib needs 921 or later.
+# See notes/COMPILER.md.
+config.armcc_version = "4.1/b921"
 config.scratch_compilers = {
-    "4.1/b894": "armcc_41_894",
+    "4.1/b921": "armcc_41_921",
 }
 
-# Base flags, common to most source files.
-# Placeholders from BigRed until notes/COMPILER.md proves them for this game.
+# Base flags, common to most source files (from BigRed). Confirmed on Squirrel with
+# build 921: -O3 -Otime (244 functions; -O3 -Ospace 36, -O2 -Otime 53), --fpmode=fast
+# (243 without) and --signed_chars (235 without). --no_rtti made no difference.
 cflags_base = [
     "--cpp",
     "--arm",
@@ -140,7 +143,14 @@ if args.non_matching:
 config.cflags = cflags_base
 
 config.libs = [
-    # No source files yet.
+    {
+        "lib": "game",
+        "cflags": cflags_base,
+        "progress_category": "game",
+        "objects": [
+            Object(Matching, "game/FieldScriptFunc.cpp"),
+        ],
+    },
 ]
 
 # Optional extra categories for progress tracking

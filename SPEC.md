@@ -43,10 +43,13 @@ Each is a lead for the region map, not yet an attribution:
   sessions).
 - **NintendoWare for CTR**: file names `.bflim` (layout images), `.bffnt` (fonts), and
   `Eft_Ptcl_*.vsh` (effect shaders).
+- **Squirrel 2.2.5** (scripting): version string `Squirrel 2.2.5 stable` at
+  0x00155C40; 244 functions match the public source (`notes/COMPILER.md`).
 - **Square Enix** online library: URLs `wi-fi.infralib.square-enix.com`,
   `dqmj3ds.sil2.square-enix.com`, `SIL_ERR_*` and `X-Sil-Version`.
-- Game code: 326 strings ending in `.cpp` (`BattleScriptFunc.cpp`,
-  `FieldScriptFunc.cpp`, ...).
+- Game code: the Squirrel bindings pass their file name to the error path:
+  `BattleScriptFunc.cpp` (140 functions in 0x0012D8E0-0x00148AE0) and
+  `FieldScriptFunc.cpp` (186 functions in 0x00251FE8-0x0025D0A0).
 
 ## Other versions
 
@@ -62,10 +65,10 @@ Updates (patch titles) are out of scope until the owner decides otherwise.
 Evidence and the candidate analysis go in `notes/COMPILER.md`. How the build works:
 `notes/BUILD_SYSTEM.md`.
 
-- **Compiler:** RVCT `armcc`, from decomp.me's `armcc.zip` (builds 4.0 b771, b821, b865,
-  b902; 4.1 b561, b713, b791, b844, b894, b921, b1049, b1440, b1454; 5.04 b82).
-  **Not identified yet.** `configure.py` uses 4.1 b894 with the flags of
-  New Super Mario Bros. 2 (BigRed) as placeholders.
+- **Compiler:** RVCT 4.1 build 921 (`armcc`), flags `--cpp --arm --cpu=MPCore
+  --fpmode=fast --apcs=/interwork --split_sections -O3 -Otime --no_rtti --no_rtti_data
+  --signed_chars`. Identified among the 14 builds of decomp.me's `armcc.zip` by
+  compiling Squirrel 2.2.5 and zlib 1.2.7 (`notes/COMPILER.md`).
 - **No armlink:** the original linker is not available. `tools/ctr/` (after BigRed)
   splits the original image into one relocatable object per unit, and links compiled
   objects back at the addresses of `symbols.txt`, reproducing what armlink did to the
@@ -97,8 +100,10 @@ Evidence and the candidate analysis go in `notes/COMPILER.md`. How the build wor
 - Analysis names stay until proven: `fn_<addr>` (functions), `lbl_<addr>` (data),
   `__ctr_start` (entry point).
 - Game units: `src/game/unit_<start address>.cpp` while real file names are unknown.
-  The 326 `.cpp` names in the image are leads: a unit takes one only when its code is
-  shown to belong to that file (an assertion or log call that passes the name).
+  A unit takes a real file name when its code passes that name (the script bindings'
+  error path passes `FieldScriptFunc.cpp` or `BattleScriptFunc.cpp`).
+- Function names from `__FUNCTION__`: when a function passes its own `__FUNCTION__`
+  string, that string is its name (`SetFogDensity_`).
 - Unknown classes and structs: `Unk<Name>` or `Unk<address>`; unknown methods keep the
   address (`fn_<addr>`, mangled as a member when the class is known).
 - Library code under `libs/<lib>/{include,src}` (`nn`, `nw`, `rvct`, `zlib`, `nex`,

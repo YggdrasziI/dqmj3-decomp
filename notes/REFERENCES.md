@@ -38,5 +38,11 @@ first. Every reuse is logged in `notes/PROVENANCE.md`.
 
 ## Public library sources
 
-- zlib 1.2.7 (zlib license): reference for the zlib units; the CTR-SDK build
-  (`1.2.7.f-NINTENDO-CTR-SDK-v1`) may differ from the public release.
+- zlib 1.2.7 (zlib license, [madler/zlib](https://github.com/madler/zlib) tag
+  `v1.2.7`): reference for the zlib units; the CTR-SDK build
+  (`1.2.7.f-NINTENDO-CTR-SDK-v1`) may differ from the public release. Used for the
+  compiler sweep (`notes/COMPILER.md`).
+- Squirrel 2.2.5 stable (zlib license, `squirrel_2.2.5_stable.tar.gz` from
+  [SourceForge](https://sourceforge.net/projects/squirrel/files/squirrel2/)): the
+  game's scripting language; reference for the Squirrel units and API names. Used for
+  the compiler sweep.
