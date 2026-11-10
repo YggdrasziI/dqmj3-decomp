@@ -106,7 +106,8 @@ def main() -> None:
     parser.add_argument("-o", "--out", type=Path, required=True, help="output code.bin")
     parser.add_argument("--map", type=Path, help="write a link map")
     parser.add_argument("units", nargs="*", metavar="UNIT=OBJECT", help="units to link")
-    args = parser.parse_args()
+    # Positionals after options: Python before 3.13 leaves "units" empty otherwise
+    args = parser.parse_intermixed_args()
 
     specs: List[str] = []
     for spec in args.units:
