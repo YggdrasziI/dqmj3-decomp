@@ -1,3 +1,7 @@
+/*
+	ALTERED SOURCE: changed to compile to the code of Dragon Quest Monsters: Joker 3;
+	this is not the original Squirrel 2.2.5 source. Changes are marked "DQMJ3".
+*/
 /*	see copyright notice in squirrel.h */
 #ifndef _SQARRAY_H_
 #define _SQARRAY_H_
@@ -68,7 +72,9 @@ public:
 		return true;
 	}
 	void ShrinkIfNeeded() {
-		if(_values.size() <= _values.capacity()>>2) //shrink the array
+		// DQMJ3: the capacity is read into a local first
+		SQUnsignedInteger cap = _values.capacity();
+		if(_values.size() <= cap>>2) //shrink the array
 			_values.shrinktofit();
 	}
 	bool Remove(SQInteger idx){

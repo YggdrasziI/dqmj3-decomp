@@ -155,7 +155,8 @@ config.libs = [
         ],
     },
     {
-        # Squirrel 2.2.5 stable, unmodified public source (zlib license, libs/squirrel/COPYRIGHT).
+        # Squirrel 2.2.5 stable (zlib license, libs/squirrel/COPYRIGHT), altered where the game's
+        # copy differs; altered files say so and mark each change "DQMJ3" (notes/PROVENANCE.md).
         # A unit claims only the functions the compiler sweep found byte for byte; the
         # game's copy differs elsewhere (notes/COMPILER.md).
         "lib": "squirrel",

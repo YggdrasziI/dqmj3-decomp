@@ -36,7 +36,9 @@ Demichelis, **zlib license** (`libs/squirrel/COPYRIGHT`, copy in
 
 | Our files | Changes |
 |---|---|
-| `libs/squirrel/include/squirrel.h`, `libs/squirrel/squirrel/*.{cpp,h}` | none (line endings normalized by git) |
+| `libs/squirrel/include/squirrel.h`, `libs/squirrel/squirrel/*.{cpp,h}` | none (line endings normalized by git), except: |
+| `libs/squirrel/squirrel/sqobject.cpp` | altered (notice at the top): `SQArray::Extend` takes each element through a local reference (2026-11-10) |
+| `libs/squirrel/squirrel/sqarray.h` | altered (notice at the top): `SQArray::ShrinkIfNeeded` reads the capacity into a local (2026-11-10) |
 
 ## Scripts from DQMJ2
 

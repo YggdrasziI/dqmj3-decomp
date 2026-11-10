@@ -1,4 +1,8 @@
 /*
+	ALTERED SOURCE: changed to compile to the code of Dragon Quest Monsters: Joker 3;
+	this is not the original Squirrel 2.2.5 source. Changes are marked "DQMJ3".
+*/
+/*
 	see copyright notice in squirrel.h
 */
 #include "sqpcheader.h"
@@ -192,8 +196,11 @@ bool SQGenerator::Resume(SQVM *v,SQInteger target)
 void SQArray::Extend(const SQArray *a){
 	SQInteger xlen;
 	if((xlen=a->Size()))
-		for(SQInteger i=0;i<xlen;i++)
-			Append(a->_values[i]);
+		for(SQInteger i=0;i<xlen;i++) {
+			// DQMJ3: the element is taken through a local reference
+			const SQObjectPtr &o = a->_values[i];
+			Append(o);
+		}
 }
 
 const SQChar* SQFunctionProto::GetLocal(SQVM *vm,SQUnsignedInteger stackbase,SQUnsignedInteger nseq,SQUnsignedInteger nop)
