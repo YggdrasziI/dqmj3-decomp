@@ -41,14 +41,15 @@ size = 0x25504
 
 # String pools: armcc 4.1 b921 puts strings that data refers to in .conststring /
 # .constwstring (mergeable), which armlink merged into one pool each. Evidence in
-# notes/SPLITS.md: packed strings, no duplicates, none the tail of another, every
-# string pointed to by data at its start; the one pointer into a narrow string's
-# tail follows armlink's choice. See tools/ctr/strpool.py.
+# notes/SPLITS.md: no duplicate string, every string pointer from .data but one
+# follows armlink's choice (tools/ctr/strpool.py). The narrow pool holds sections
+# with 4-byte alignment (zero padding) and 0xFF fill between sections; 0xFF bytes
+# bound it on both sides.
 
 [[string_pools]]
 section = ".conststring"
-address = 0x007C1724
-size = 0x260A
+address = 0x007B1D7C
+size = 0x12712
 char_size = 1
 
 [[string_pools]]

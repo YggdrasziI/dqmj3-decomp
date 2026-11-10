@@ -117,28 +117,22 @@ Both are in `config.toml`:
 
 | Pool | Range | Evidence |
 |---|---|---|
-| `.conststring` | 0x007C1724-0x007C3D2E (0x260A) | the only long run of packed narrow strings that data points to: 319 ASCII strings, no padding, no duplicate, none the tail of another; 319 pointers, one to the start of each string, none from code. One more pointer (0x0082061C) points to the `r` that ends a string: of the 7 strings ending in `r`, armlink's rule (the last when read backwards, `tools/ctr/strpool.py`) picks `dmp_LightEnv.shadowSelector`, the one pointed to. |
+| `.conststring` | 0x007B1D7C-0x007C448E (0x12712) | 3,859 strings, all text, no duplicate. 0xFF (armlink's fill) right before and after. Inside, runs of strings sorted by the string read backwards (one run per input section: Squirrel's `.c` ... `dummy` is exactly the `base_funcs` strings), some packed, some 4-aligned with zero padding, 0xFF between sections. armlink's rule (whole string, else the tail of the host that comes last read backwards, `tools/ctr/strpool.py`) gives 2,321 of the 2,322 string pointers in `.data`. The exception: 0x007E2C44 points to `w_00` inside `arrow_00` (0x007B2E74), where the rule picks `scout_arrow_00`; `arrow_00` itself was not merged into `scout_arrow_00`, so the merge was not one global pass (per group of sections?): open. The first bound found (0x007C1724-0x007C3D2E) was one run inside it. |
 | `.constwstring` | 0x007CAB34-0x007CC0A2 (0x156E) | 168 UTF-16 strings (`rom:/data/Community/CommunityPrize.nut`, ...), packed, no duplicate, none the tail of another, each pointed to once at its start (167 from data, 1 from `.text`); 0xFF padding (armlink's fill) right before and after, so one section of its own. |
 
 Other strings in `.rodata` are 4-aligned with zero padding between them (compiler
 `.constdata`), or in small sections that 0xFF padding separates (for example many
-UTF-16 `rom:/data/...` paths at 0x007C4490-0x007C6900, one section each). The pools
-are not proven by a matched unit yet.
+UTF-16 `rom:/data/...` paths at 0x007C4490-0x007C6900, one section each).
+`squirrel/sqbaselib.cpp`'s `.data` (144 string pointers) matches through the narrow pool.
 
-### Squirrel's strings: a second `.conststring` block (2026-11-10)
+### Squirrel's strings (2026-11-10)
 
-The names and type masks in `sqbaselib.cpp`'s delegate tables (`base_funcs`, `_table_default_delegate_funcz`
-...) are not in the pool above. 0x007C4031-0x007C421C holds Squirrel's strings, packed and **sorted by the
-string read backwards** (`.c`, `newthread`, `suspend`, `collectgarbage`, `getroottable`, ...: `c.` <
-`daerhtwen` < `dnepsus` < ...), the order tail merging produces. zlib's `z_errmsg` strings (`stream end` ...
-`insufficient memory`) come right before it, C++ library messages (`%s: bad locale name` ...) after it.
-Strings that exist earlier in the image are left out of the block and point there instead: `clear` is the
-tail of `judge_clear` (0x007B4606), `pop` of `apeal_pop` (0x007B4036), `t` is a game string at 0x007B3BDC,
-likewise `sort`, `top`, `an`, `x`. So armlink did not build one pool for the whole program: it looks like one
-merged, sorted block per library (or per group of objects), deduplicated against what was already placed.
-How the block of a string is chosen, and which copy of a duplicate wins, is open. `strpool.py` knows one
-pool per section name; until it knows more, `sqbaselib.cpp`'s `.data` scores 67 % (the 21 function
-pointers match, the string pointers do not resolve to the same symbols).
+0x007C4031-0x007C421C holds Squirrel's strings in runs, one per `.conststring` section of
+`sqbaselib.cpp` (`.c` ... `dummy`, `rawdelete` ... `rawset`, ...), each sorted by the string read
+backwards; zlib's `z_errmsg` strings (`stream end` ... `insufficient memory`) come right before, C++
+library messages (`%s: bad locale name` ...) after. Strings already in the pool earlier are left out
+and point there: `clear` is the tail of `judge_clear` (0x007B4606), `pop` of `apeal_pop` (0x007B4036),
+`t` is the game's string at 0x007B3BDC.
 
 ## Static initializer table (2026-11-10)
 

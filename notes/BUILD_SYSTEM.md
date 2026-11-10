@@ -157,8 +157,9 @@ symbol at that address in `symbols.txt`: the compiled object has none either, an
 symbol by symbol.
 
 **String pools.** `.conststring` and `.constwstring` are mergeable sections, and armlink merged them across
-the whole program into one pool each. Their location is recorded in `config.toml` once found (not yet for
-this game).
+the whole program into one pool each. Their location is recorded in `config.toml` (evidence in
+`notes/SPLITS.md`). A pool is not always packed: the strings of input sections with 4-byte alignment keep
+their zero padding, and armlink's 0xFF fill separates input sections. `strpool.py` skips both.
 
 In a pool every string exists once, and a string that is the tail of another one does not exist on its own:
 `"wait"` is the last four characters of `"bg_wait"`. If several strings end in the one being looked for, armlink
@@ -168,7 +169,15 @@ follows the same rule, which reproduced every pointer into the two pools of New 
 A pool does not belong to any unit and can not be claimed in `splits.txt`. `link.py` gives a reference to a
 pooled string the address that string has in the original, and fails if the original has no such string.
 `split.py` does the reverse: for data that points into a pool it emits a `.conststring` section with just those
-strings, so that it looks like the compiler's output.
+strings, so that it looks like the compiler's output (one per claimed data range, each string once, in the
+order the data refers to them). A pointer that the rule does not reproduce stays an ordinary pointer.
+
+`prelink.py` rewrites the addends of the compiled object's pointers to its string literals to that same
+layout, per claimed data range: the compiler's own order of the literals never reaches the image (the linker
+looks them up by contents), but it is in the data words that objdiff compares.
+
+armcc gives some data objects a `.data` section each (the delegate tables of `sqbaselib.cpp`, each with its
+own `.conststring`). objdiff pairs sections by name, so such a unit claims one `.data` range per section.
 
 ## Bootstrapping symbols.txt
 

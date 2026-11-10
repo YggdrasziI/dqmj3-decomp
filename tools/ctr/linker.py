@@ -313,15 +313,7 @@ class PlacedObject:
         data = section.data
         if not 0 <= offset < len(data):
             raise LinkError(f"{where}: reference past the end of {section.name}")
-        # Find the literal the offset falls into
-        start = 0
-        while True:
-            end = StringPool.find_terminator(data, start, pool.char_size)
-            if end is None:
-                end = len(data)
-            if offset <= end or end == len(data):
-                break
-            start = end + pool.char_size
+        start, end = StringPool.literal_containing(data, offset, pool.char_size)
         contents = data[start:end]
         address = pool.locate(contents)
         if address is None:

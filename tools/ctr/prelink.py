@@ -29,7 +29,8 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 from ctr import elf
 from ctr.image import Image, VersionConfig
-from ctr.linker import LinkContext, LinkError, PlacedObject, Placement
+from ctr.linker import LinkContext, LinkError, PlacedObject, Placement, is_string_section
+from ctr.strpool import StringPool
 from ctr.symbols import Splits, SymbolTable
 
 SH_SIZE_OFFSET = 20  # sh_size within Elf32_Shdr
@@ -80,6 +81,65 @@ def validate_batch_jobs(batch: dict) -> List[dict]:
     return jobs
 
 
+def canonical_string_addends(obj: PlacedObject, data: bytearray) -> None:
+    """
+    Lay out the string literals that data points to the way split.py does.
+
+    armlink resolves a pointer to a string literal by its contents (strpool.py), so
+    where a literal sits in the object's string sections does not reach the image. But
+    the object keeps the offset in the data word (REL), and armcc gives each data
+    section its own string section, while a split object has one string section per
+    claimed data range: every distinct string once (a pointer into a string counts as
+    the string from there on), in the order the data refers to them. The addends are
+    rewritten to that layout so that objdiff compares the strings, not where the
+    compiler happened to put them. Only the addends change: the string sections keep
+    their compiled contents, so an addend indexes the layout, not its own section.
+    """
+    groups: Dict[object, List[elf.Section]] = {}
+    for section in obj.elf.sections:
+        if section.is_code or not section.is_alloc or is_string_section(section):
+            continue
+        if not section.relocs:
+            continue
+        placement = obj.placements.get(section.index)
+        key: object = ("section", section.index)
+        if placement is not None and obj.unit is not None:
+            for rng in obj.unit.ranges:
+                if rng.contains(placement.address):
+                    key = (rng.section, rng.start, rng.end)
+                    break
+        groups.setdefault(key, []).append(section)
+
+    for sections in groups.values():
+        sections.sort(key=lambda s: (obj.placements[s.index].address if s.index in obj.placements else 0, s.index))
+        # Separate layouts per pool section name (.conststring, .constwstring)
+        offsets: Dict[str, Dict[bytes, int]] = {}
+        sizes: Dict[str, int] = {}
+        for section in sections:
+            for reloc in sorted(section.relocs, key=lambda r: r.offset):
+                if reloc.type != elf.R_ARM_ABS32:
+                    continue
+                sym = obj.elf.symbols[reloc.symbol]
+                # armcc refers to its string literals through the section symbol
+                if sym.type != elf.STT_SECTION or sym.shndx in (elf.SHN_UNDEF, elf.SHN_ABS, elf.SHN_COMMON):
+                    continue
+                target = obj.elf.sections[sym.shndx]
+                pool = obj.ctx.string_pools.get(target.name)
+                if not is_string_section(target) or pool is None:
+                    continue
+                word_at = section.offset + reloc.offset
+                offset = struct.unpack_from("<I", data, word_at)[0]
+                if not 0 <= offset < len(target.data):
+                    continue
+                _, end = StringPool.literal_containing(target.data, offset, pool.char_size)
+                contents = target.data[offset:end]
+                layout = offsets.setdefault(target.name, {})
+                if contents not in layout:
+                    layout[contents] = sizes.get(target.name, 0)
+                    sizes[target.name] = layout[contents] + len(contents) + pool.char_size
+                struct.pack_into("<I", data, word_at, layout[contents])
+
+
 def prepare_object(
     ctx: LinkContext, input_path: Path, output_path: Path, unit
 ) -> int:
@@ -107,6 +167,8 @@ def prepare_object(
             struct.pack_into("<I", data, section.offset + reloc.offset, 0)
             rel_index, entry = reloc.origin
             removed.setdefault(rel_index, set()).add(entry)
+
+    canonical_string_addends(obj, data)
 
     # R_ARM_NONE only tells armlink to pull in a library object (armcc emits them
     # against _printf_* for format strings); they change no bytes, the linker

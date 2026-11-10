@@ -124,10 +124,18 @@ class Splitter:
             lambda addr: addr in self.function_addrs,
         )
 
-    def string_pool_at(self, value: int) -> Optional[StringPool]:
+    def string_literal_at(self, value: int) -> Optional[Tuple[StringPool, bytes]]:
+        """
+        The pool and contents of the string literal a word points to. A pointer that
+        armlink's rule (StringPool.locate) would not reproduce, or one into padding,
+        is left to be resolved like any other pointer.
+        """
         for pool in self.string_pools:
-            if pool.contains(value) and (value - pool.address) % pool.char_size == 0:
-                return pool
+            if pool.contains(value):
+                contents = pool.string_at(value)
+                if contents is not None and pool.locate(contents) == value:
+                    return pool, contents
+                return None
         return None
 
     def resolve_pointer(self, value: int) -> Optional[Tuple[Union[Symbol, SplitRange], int]]:
@@ -445,12 +453,13 @@ class Splitter:
         for addr in range(first, rng.end - 3, 4):
             off = addr - rng.start
             value = struct.unpack_from("<I", data, off)[0]
-            pool = self.string_pool_at(value)
-            if pool is not None:
+            literal = self.string_literal_at(value)
+            if literal is not None:
+                pool, contents = literal
                 literals = strings.get(pool.name)
                 if literals is None:
                     literals = strings[pool.name] = StringSection(writer, pool)
-                struct.pack_into("<I", data, off, literals.add(pool.string_at(value)))
+                struct.pack_into("<I", data, off, literals.add(contents))
                 section.relocs.append(elf.Reloc(off, elf.R_ARM_ABS32, literals.symbol))
                 continue
             resolved = self.resolve_pointer(value)
