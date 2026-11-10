@@ -46,6 +46,21 @@ class StringPoolDef:
 
 
 @dataclass
+class InitArrayDef:
+    """Where armlink put the static initializer table (the .init_array sections).
+
+    Each entry is the offset from the entry to an initializer function (+1 for
+    Thumb), not its address. See notes/BUILD_SYSTEM.md."""
+
+    address: int
+    size: int
+
+    @property
+    def end(self) -> int:
+        return self.address + self.size
+
+
+@dataclass
 class RegionDef:
     """An address range of .text attributed to a library. See config.toml."""
 
@@ -75,6 +90,10 @@ class VersionConfig:
             StringPoolDef(p["section"], p["address"], p["size"], p.get("char_size", 1))
             for p in data.get("string_pools", [])
         ]
+        init_array = data.get("init_array")
+        self.init_array: Optional[InitArrayDef] = (
+            InitArrayDef(init_array["address"], init_array["size"]) if init_array else None
+        )
         self.regions: List[RegionDef] = sorted(
             (RegionDef(r["id"], r["name"], r["start"], r["end"]) for r in data.get("regions", [])),
             key=lambda r: r.start,

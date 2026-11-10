@@ -205,6 +205,12 @@ never labelled.
   `objdiff-cli report generate` ignores relocation targets (`none`), unlike `objdiff-cli diff` and the
   objdiff GUI: a function that calls `fn_0016CCF0` where ours calls `SQVM::GetAt` counted as a match. With
   the option a function only matches when its calls and references go to the same names.
+- `tools/ctr/split.py`, `tools/ctr/image.py`: the static initializer table (`[init_array]` in `config.toml`)
+  is split into `.init_array` sections, as armcc emits them: one word of 0 per entry with an `R_ARM_TARGET1`
+  relocation against the initializer (`__sti___<n>_<file>`). armlink wrote the offset from the entry to the
+  function instead, which `linker.py` (BigRed) already reproduces. Without it the entry of a unit was a
+  `.constdata` section that objdiff could not pair with the compiled `.init_array`. An entry that does not
+  point to the start of a function in `symbols.txt` is an error: fix the function bounds.
 - `tools/ctr/prelink.py`: `R_ARM_NONE` relocations are dropped from the object objdiff reads. armcc emits them
   against `_printf_*` so that armlink pulls in the format handlers a format string needs; they change no
   bytes, the linker ignores them, and objdiff can not read them.

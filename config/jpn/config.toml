@@ -57,4 +57,12 @@ address = 0x007CAB34
 size = 0x156E
 char_size = 2
 
+# Static initializer table: 2,105 words at the end of .rodata, each the offset from
+# the word to an initializer function (+1 for Thumb). 2,103 point to the start of a
+# function in symbols.txt. Evidence in notes/SPLITS.md.
+
+[init_array]
+address = 0x007CC1F8
+size = 0x20E4
+
 # Library regions are not located yet (notes/SPLITS.md).

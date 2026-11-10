@@ -43,6 +43,7 @@ DATA_SECTION_FLAGS = {
 }
 
 SWITCH_SYMBOL = "__switch$$"
+INIT_ARRAY = ".init_array"
 VTABLE_PREFIX = "_ZTV"
 
 
@@ -349,6 +350,19 @@ class Splitter:
         Parts of a data range that the compiler emits as separate sections, with the
         name of the section. Vtables are in `.constdata__ZTV<class>`.
         """
+        init_array = self.config.init_array
+        if init_array is not None and rng.start < init_array.end and init_array.address < rng.end:
+            # The static initializer table: armcc emits each file's entry in .init_array
+            lo, hi = max(rng.start, init_array.address), min(rng.end, init_array.end)
+            pieces = []
+            for part, name in (
+                (SplitRange(rng.section, rng.start, lo), None),
+                (SplitRange(rng.section, lo, hi), INIT_ARRAY),
+                (SplitRange(rng.section, hi, rng.end), None),
+            ):
+                if part.end > part.start:
+                    pieces += [(part, name)] if name else self.data_pieces(part)
+            return pieces
         pieces: List[Tuple[SplitRange, Optional[str]]] = []
         cursor = rng.start
         for sym in self.symbols.in_range(rng.start, rng.end):
@@ -364,10 +378,32 @@ class Splitter:
             pieces.append((SplitRange(rng.section, cursor, rng.end), None))
         return pieces
 
+    def emit_init_array(self, writer, rng: SplitRange, pending) -> None:
+        """
+        Entries of the static initializer table, as the compiler emits them: a word of 0
+        with an R_ARM_TARGET1 relocation against the initializer. armlink wrote the
+        offset from the entry to the function instead (see linker.py).
+        """
+        section = elf.Section(INIT_ARRAY, elf.SHT_INIT_ARRAY, elf.SHF_ALLOC, align=4)
+        data = bytearray(rng.end - rng.start)
+        for addr in range(rng.start, rng.end - 3, 4):
+            target = (addr + struct.unpack_from("<I", self.image.read(addr, 4))[0]) & 0xFFFFFFFF
+            resolved = self.resolve_pointer(target)
+            if resolved is None or resolved[1]:
+                raise ValueError(f"{INIT_ARRAY} entry at 0x{addr:08X} points to 0x{target:08X}, "
+                                 "which is not the start of a function in symbols.txt")
+            pending.append((section, addr - rng.start, elf.R_ARM_TARGET1, resolved[0]))
+        section.data = bytes(data)
+        writer.add_section(section)
+        writer.add_symbol(elf.Symbol("$d", 0, shndx=section.index))
+
     def emit_data(
         self, writer, kind: str, rng: SplitRange, defined, pending, bind_of, name: Optional[str] = None
     ) -> None:
         size = rng.end - rng.start
+        if name == INIT_ARRAY:
+            self.emit_init_array(writer, rng, pending)
+            return
         section = elf.Section(
             name or DATA_SECTION_NAMES[kind],
             elf.SHT_NOBITS if kind == "bss" else elf.SHT_PROGBITS,
