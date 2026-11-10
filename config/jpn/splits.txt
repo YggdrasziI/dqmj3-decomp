@@ -74,7 +74,7 @@ squirrel/sqcompiler.cpp:
 	.text       start:0x001C174C end:0x001C1B38
 
 squirrel/sqdebug.cpp:
-	.text       start:0x0018E614 end:0x0018E704
+	.text       start:0x0018E3C4 end:0x0018E704
 	.text       start:0x00197438 end:0x0019774C
 	.text       start:0x006AE8CC end:0x006AE9C4
 

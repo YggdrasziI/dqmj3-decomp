@@ -142,6 +142,9 @@ if args.non_matching:
     cflags_base.append("-DNON_MATCHING")
 config.cflags = cflags_base
 
+# Squirrel units that link byte for byte (notes/SPLITS.md)
+SQUIRREL_MATCHING = {"sqdebug"}
+
 config.libs = [
     {
         "lib": "game",
@@ -160,7 +163,7 @@ config.libs = [
         "cflags": [*cflags_base, "--no_dep_name", "-Ilibs/squirrel/include"],
         "progress_category": "lib",
         "objects": [
-            Object(NonMatching, f"squirrel/{name}.cpp")
+            Object(Matching if name in SQUIRREL_MATCHING else NonMatching, f"squirrel/{name}.cpp")
             for name in (
                 "sqapi", "sqbaselib", "sqclass", "sqcompiler", "sqdebug", "sqfuncstate",
                 "sqlexer", "sqobject", "sqstate", "sqtable", "sqvm",
