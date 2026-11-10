@@ -58,6 +58,7 @@ Source: the owner's DQMJ2 decompilation (`YggdrasziI/dqmj2-decomp`, CC0-1.0), co
 | `tools/disasm.py` | disassembly of functions of the original image, through objdiff-cli |
 | `tools/ghidra_elf.py` | writes `code.bin` as an ELF executable (segments from `config.toml`) for Ghidra |
 | `tools/ghidra_sync.py`, `tools/ghidra/SyncSymbols.java` | import into a Ghidra project and apply `symbols.txt` (Thumb mode, functions, labels, names) headless; same purpose as DQMJ2's `ghidra_sync.py`, which drove dsd-ghidra |
+| `tools/link_density.py` | call-graph density of `.text` windows, to find self-contained (library) blocks |
 | `tools/reloc_names.py` | names the analysis symbols that matched functions call or refer to, from the relocations of our objects |
 | `tools/sweep_names.py` | names `symbols.txt` functions from a `compiler_sweep.py --json` result |
 

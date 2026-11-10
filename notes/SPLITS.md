@@ -49,6 +49,24 @@ Functions that reference a library-specific string (inline literal pool or `.rod
   one block either, or the blocks at 0x005B/0x0062/0x0063 are other library parts. Not
   resolved.
 
+### Call-graph density (`tools/link_density.py`)
+
+Share of the direct calls (ARM and Thumb `BL`/`BLX`) made from a 128 KiB window that
+stay in it: about 0.03-0.13 over most of `.text` (game code calls everything), but a
+plateau of 0.2-0.54 over 0x003E0000-0x004DFFFF, and 0.4-0.65 over 0x00150000-0x0019FFFF
+(dense Squirrel functions). Scoring functions by their links (callers and callees)
+into 0x003F0000-0x004C0000 gives sharp edges:
+
+- start: 0.01-0.11 up to 0x003E9248, 0.49 from 0x003E924C, 0.63 from 0x003E9BAC;
+- end: 0.32 up to 0x004C81EC, 0.02-0.08 from 0x004C81F0.
+
+So a self-contained block of about 0x003E9A00-0x004C8000 (0.9 MB) holds the NEX
+version string and 11 of the 12 PIA markers: likely the network libraries (NEX, PIA,
+perhaps more). Hypothesis: the edges are statistical, not function-exact, and the
+block makes 6,257 calls inside and 4,074 to 667 functions outside it (runtime, SDK and helpers placed in the
+sorted runs). The game-side callers of PIA (0x005D0000, 0x00620000-0x00630000) are
+outside it.
+
 No `[[regions]]` from these: no bound is proven.
 
 ## String pools (2026-11-10)
@@ -84,9 +102,25 @@ mangled names ascend, for example:
 
 So within a run, game and library functions are mixed in name order, and a library is
 not one address range: `[[regions]]` by address can not separate Squirrel from the game
-code around it. What delimits a run is not known (hypotheses: an armlink `--sort`
-within groups of input sections, or partial links sorted one by one). The 26 run
-bounds are only where two known names are out of order, not proven unit bounds.
+code around it. The 26 run bounds are only where two known names are out of order,
+not proven unit bounds.
+
+What delimits a run (tested 2026-11-10 on 598 known names, with the script bindings
+named from their `__FUNCTION__` string):
+
+- The sort key is the armcc section name: with `t.` for template instances (as armcc
+  names them, checked on our Squirrel objects) and `i.` for the rest, runs drop from
+  26 to 24, and every template instance (`sqvector<...>`) sits at the end of a run.
+  Within a run, plain `strcmp` order: `_Z...`, then `__aeabi_*`, then C names (`sq_*`).
+- Other keys fit worse: case-folded names 27-30 runs, demangled names 128-130.
+- Runs interleave function by function, not object by object: `sq_pop` (0x0016CC68,
+  `sqapi.cpp`), `SQVM::Pop(int)` (0x0016CC80, `sqvm.cpp`, a new run), `sq_pushroottable`
+  (0x0016CCC4), `SQVM::Push` (0x0016CCCC, a new run). So not sorted objects (or
+  partial links) laid end to end.
+- A call-graph property as primary key (call height, number of callees, number of
+  callers, ascending or descending, then the name) gives 98-200 runs: rejected.
+- armlink is not in decomp.me's `armcc.zip`, so the sort options (`--sort=...`) can
+  not be tried. Open.
 
 ## Units
 
