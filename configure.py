@@ -143,7 +143,7 @@ if args.non_matching:
 config.cflags = cflags_base
 
 # Squirrel units that link byte for byte (notes/SPLITS.md)
-SQUIRREL_MATCHING = {"sqdebug", "sqtable"}
+SQUIRREL_MATCHING = {"sqdebug", "sqtable", "sqstate"}
 
 config.libs = [
     {

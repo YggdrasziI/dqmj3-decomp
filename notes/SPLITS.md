@@ -125,6 +125,22 @@ Other strings in `.rodata` are 4-aligned with zero padding between them (compile
 UTF-16 `rom:/data/...` paths at 0x007C4490-0x007C6900, one section each). The pools
 are not proven by a matched unit yet.
 
+## Static initializer table (2026-11-10)
+
+`[init_array]` in `config.toml`: 0x007CC1F8-0x007CE2DC (0x20E4), the end of `.rodata`.
+Each of its 2,105 words is the offset from the word to a function (+1 for 3 Thumb
+ones): the relative form of `.init_array` that `linker.py` reproduces. Before
+0x007CC1F8 the words (8, 0x43, -8, 0) do not point into `.text`. All 2,105 targets
+are function starts in `symbols.txt` once two bounds are fixed (0x006602D0 started 4
+bytes early, inside the literal pool of `fn_006602C0`; 0x0066FD74-0x0066FDA0 is a
+table of 11 addresses, not code). Proven for one entry by a matched unit:
+0x007CE0B0 is `__sti___11_sqstate_cpp` (0x00655B48) of `squirrel/sqstate.cpp`.
+
+The initializers (one per source file that has static objects with constructors)
+lie in 0x00650000-0x0069FFFF. armcc names them `__sti___<n>_<file>`; in the image
+they have no names. The table keeps the order armlink read the objects in; using
+that order to group units is not tried yet.
+
 ## Code order: runs sorted by mangled name (2026-11-10)
 
 Known function names (273 in `symbols.txt` plus the 326 script bindings, named by the
@@ -174,5 +190,6 @@ named from their `__FUNCTION__` string):
 |---|---|---|---|
 | `game/FieldScriptFunc.cpp` | `.text` 0x002546FC-0x00254784, `.rodata` 0x00725800-0x0072580F | `SetFogDensity_` and its `__FUNCTION__` string | Matching (2026-11-10) |
 | `squirrel/sqdebug.cpp` | 0x0018E3C4-0x0018E704, 0x00197438-0x0019774C, 0x006AE8CC-0x006AE9C4 | 7 functions (`SQVM::PrintObjVal`, both `SQVM::Raise_Error`, `Raise_IdxError`, `Raise_CompareError`, `Raise_ParamTypeError`, `sq_stackinfos`); `sq_getfunctioninfo` is not in the game (removed by armlink) | Matching (2026-11-10) |
+| `squirrel/sqstate.cpp` | 13 `.text` ranges, `.rodata` 0x007CE0B0-0x007CE0B4 (its `.init_array` entry), `.data` 0x008108F8-0x00810920 | 14 functions with `__sti___11_sqstate_cpp`, and `_null_`, `_true_`, `_false_`, `_one_`, `_minusone_` | Matching (2026-11-10) |
 | `squirrel/sqtable.cpp` | 8 `.text` ranges, `.rodata` 0x007A7E34-0x007A7E54 (`_ZTV7SQTable`) | 14 functions and the vtable; its slots named `SQTable::~SQTable` and `SQTable::Finalize`; `D0` is 0 in the original (removed) | Matching (2026-11-10) |
 | `squirrel/<file>.cpp` (9 other files, `libs/squirrel/`) | 125 `.text` ranges | the functions the sweep found, plus the functions named by the calls of matched code (`tools/reloc_names.py`) that compile to the same code | NonMatching: 223 of 229 at 100 % in objdiff with relocation targets compared; the 6 others refer to a long string literal (`.constdata`) or a vtable whose `.rodata` is not claimed yet. 13 named functions differ from the 2.2.5 source (game changes, not claimed): `sq_setparamscheck`, `SQClass::CreateInstance`, `SQCompiler::{Expression, PrefixedExpr, LogicalAndExp, Compile}`, `SQFuncState::~SQFuncState`, `SQArray::Extend`, `SQVM::{CallNative, Pop(), Push, ObjCmp, Execute}`; `SQLexer::Lex` waits for the unit's `.constdata` |
