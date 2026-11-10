@@ -99,6 +99,11 @@ def classify(row):
     pool = re.compile(r"(?:ldr|add) (r\d+), (?:\[pc, #0x[0-9a-f]+\]|pc, #0x[0-9a-f]+$)")
     if pool.match(a) and pool.match(b):
         return "pool" if pool.match(a).group(1) == pool.match(b).group(1) else "register"
+    # Only branches inside the function: a call to another target is a real difference
+    # (bl, blx, bl<cond>, blx<cond>; b<cond> such as ble or bls has three letters)
+    op = a.split(" ")[0]
+    if op in ("bl", "blx") or (op.startswith("blx") and len(op) == 5) or (op.startswith("bl") and len(op) == 4):
+        return "other"
     if a.split(" ")[0].startswith("b") and REG.sub("R", a).split(" ")[0] == b.split(" ")[0] \
             and re.fullmatch(r"b\w* 0x[0-9a-f]+", a) and re.fullmatch(r"b\w* 0x[0-9a-f]+", b):
         return "branch"

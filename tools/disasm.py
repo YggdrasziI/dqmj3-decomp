@@ -4,7 +4,7 @@ Prints the disassembly of functions of the original image.
 
 Finds the split object (build/<version>/delink/) of the unit that holds each symbol and
 disassembles it with objdiff-cli. Relocation targets are shown by name, and literal
-pool words that hold text are shown as strings. Run `ninja split` first.
+pool words that hold a string are shown as one. Run `ninja split` first.
 
 Usage:
     python tools/disasm.py fn_002546FC [fn_001446A0 ...] [--version jpn]
@@ -27,9 +27,16 @@ from ctr.symbols import Splits, SymbolTable  # noqa: E402
 from ctr.units import object_name, resolve_units  # noqa: E402
 
 
-def text_of(words):
-    data = b"".join(struct.pack("<I", w) for w in words)
-    return data.split(b"\0")[0]
+def print_pool(base, pool):
+    """Unrelocated literal pool words: as a string when they hold one (printable bytes
+    up to a NUL in the last word), else one word per line."""
+    data = b"".join(struct.pack("<I", w) for _, w in pool)
+    text = data.split(b"\0")[0]
+    if len(text) >= 4 and len(data) - len(text) <= 4 and all(32 <= c < 127 or c in (9, 10) for c in text):
+        print(f"  {base + pool[0][0]:08X}  .ascii {text!r}")
+        return
+    for off, w in pool:
+        print(f"  {base + off:08X}  .word 0x{w:08X}")
 
 
 def main() -> None:
@@ -51,15 +58,25 @@ def main() -> None:
             print(f"{name}: not in symbols.txt")
             continue
         unit = next((u for u in units if any(r.start <= sym.address < r.end for r in u.ranges)), None)
+        if unit is None:
+            print(f"{name}: no unit covers 0x{sym.address:08X}")
+            continue
         obj = ROOT / "build" / args.version / "delink" / object_name(unit)
         with tempfile.TemporaryDirectory() as tmp:
             out = Path(tmp) / "d.json"
-            subprocess.run([str(objdiff), "diff", "-1", str(obj), "-o", str(out), "--format", "json", name],
-                           check=True, capture_output=True)
+            res = subprocess.run([str(objdiff), "diff", "-1", str(obj), "-o", str(out), "--format", "json", name],
+                                 capture_output=True, text=True)
+            if res.returncode != 0 or not out.is_file():
+                print(f"{name}: objdiff-cli failed (run `ninja split` first?)")
+                print(res.stderr.strip())
+                continue
             data = json.loads(out.read_text())
         side = data["left"]
         names = [s.get("name", "?") for s in side["symbols"]]
-        fn = next(s for s in side["symbols"] if s.get("name") == name)
+        fn = next((s for s in side["symbols"] if s.get("name") == name), None)
+        if fn is None:
+            print(f"{name}: not in {obj.name}")
+            continue
         mode = " (thumb)" if sym.thumb else ""
         print(f"{name} @ 0x{sym.address:08X}, 0x{sym.size:X} bytes{mode}, unit {unit.name}")
         pool = []
@@ -73,15 +90,15 @@ def main() -> None:
                 # objdiff-cli leaves out the name of some types (R_ARM_JUMP24)
                 kind = rel.get("type_name") or elf.RELOC_NAMES.get(rel.get("type"), f"type {rel.get('type')}")
                 text = f"{text}    ; {kind} {target}"
-            if text.startswith(".word 0x"):
-                pool.append(int(text.split()[1], 16))
+            elif text.startswith(".word 0x"):
+                pool.append((off, int(text.split()[1], 16)))
                 continue
             if pool:
-                print(f"           .ascii {text_of(pool)!r}")
+                print_pool(sym.address, pool)
                 pool = []
             print(f"  {sym.address + off:08X}  {text}")
         if pool:
-            print(f"           .ascii {text_of(pool)!r}")
+            print_pool(sym.address, pool)
         print()
 
 

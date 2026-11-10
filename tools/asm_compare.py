@@ -72,7 +72,8 @@ def unit_cmd(unit):
 
 
 def objects_cmd(original, ours):
-    return [OBJDIFF, "diff", "-1", original, "-2", ours]
+    # objdiff-cli runs in ROOT: paths are taken from the caller's directory
+    return [OBJDIFF, "diff", "-1", os.path.abspath(original), "-2", os.path.abspath(ours)]
 
 
 def rows(symbol_json):

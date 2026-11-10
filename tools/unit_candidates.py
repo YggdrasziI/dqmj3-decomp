@@ -42,7 +42,8 @@ def read_calls(delink_dir, addr_of):
         funcs = {}  # section index -> [(value, size, name)] of its defined functions
         for sym in obj.symbols:
             if sym.type == elf.STT_FUNC and sym.is_defined and sym.shndx < len(obj.sections):
-                funcs.setdefault(sym.shndx, []).append((sym.value, sym.size, sym.name))
+                # A Thumb function's value has bit 0 set
+                funcs.setdefault(sym.shndx, []).append((sym.value & ~1, sym.size, sym.name))
         for section in obj.sections:
             if not section.is_code:
                 continue

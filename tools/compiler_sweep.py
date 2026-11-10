@@ -23,7 +23,8 @@ Matching rules:
     replaced with `mov r0, r0` or with the called instruction is therefore not found;
   - only functions of at least --min-size bytes with at least 3 unmasked words are
     searched, at 4-byte (ARM) or 2-byte (Thumb) alignment in .text;
-  - a function found at more than one address is counted as ambiguous, not a match.
+  - a function found at more than one address is counted as ambiguous, not a match;
+    a name that two sources define and that is found at two addresses is a conflict.
 
 Compilers are expected in build/compilers/<build>/bin/armcc.exe (downloaded with
 tools/download_tool.py armcc when missing).
@@ -99,7 +100,17 @@ def project_objects(project: Path) -> List[Tuple[Path, List[str]]]:
             # Same resolution as tools/project.py (ResolvedObject)
             flags = list(obj.options.get("cflags", lib.get("cflags", config.cflags)))
             flags += list(obj.options.get("extra_cflags", []))
-            out.append((src_dir / obj.name, [f for f in flags if not f.startswith("-I")]))
+            # Include directories are relative to the project: make them absolute
+            kept, it = [], iter(flags)
+            for f in it:
+                if f == "-I":
+                    f = "-I" + next(it, "")
+                if f.startswith("-I"):
+                    path = Path(f[2:])
+                    kept.append(f"-I{path if path.is_absolute() else project / path}")
+                else:
+                    kept.append(f)
+            out.append((src_dir / obj.name, kept))
     return out
 
 
@@ -202,7 +213,7 @@ def main() -> None:
     text_bytes = image.read(text.address, text.size)
 
     builds = [b.strip() for b in args.builds.split(",") if b.strip()]
-    results: Dict[str, Dict[str, object]] = {}  # function -> build -> address | "ambiguous" | None
+    results: Dict[str, Dict[str, object]] = {}  # function -> build -> address | "ambiguous" | "conflict" | None
     failures: Dict[str, int] = {}
 
     with tempfile.TemporaryDirectory() as tmp:
@@ -234,10 +245,19 @@ def main() -> None:
                         continue
                     for name, size, hits in found:
                         entry = results.setdefault(name, {"size": size, "source": str(source), "sizes": {}})
+                        new = f"0x{hits[0]:08X}" if len(hits) == 1 else "ambiguous" if hits else None
+                        # Several sources can define one name (inline and template copies,
+                        # static functions): keep a hit, and flag two different ones
+                        old = entry.get(build)
+                        if old is not None and new != old:
+                            if new is None:
+                                continue
+                            if old != "ambiguous" and new != "ambiguous":
+                                new = "conflict"
                         # The size can differ between builds; "size" is the first one seen
                         entry["sizes"][build] = size
-                        entry[build] = (f"0x{hits[0]:08X}" if len(hits) == 1
-                                        else "ambiguous" if hits else None)
+                        entry.setdefault("sources", {})[build] = str(source)
+                        entry[build] = new
             failures[build] = failed
             matched = sum(1 for r in results.values() if isinstance(r.get(build), str) and r[build].startswith("0x"))
             print(f"{build:10} {matched:5} functions found ({failed} sources failed to compile)", flush=True)

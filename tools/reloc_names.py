@@ -14,6 +14,7 @@ A name is applied only when:
     and no other analysis name is given the same real name;
   - the real name is a global or weak symbol of our object (not a section, a local
     or a mapping symbol) and is not already in symbols.txt;
+  - our sources (src/, include/, libs/) do not use the analysis name;
   - a call (R_ARM_CALL / JUMP24 / PC24) targets a function of symbols.txt.
 
 Run `ninja` first: it reads build/jpn/report.json and the objects in
@@ -42,6 +43,16 @@ DIFF = ROOT / "build" / "jpn" / "diff"
 LINE = re.compile(r"^(?P<name>\S+) = (?P<section>\.\w+):0x(?P<addr>[0-9A-Fa-f]+);(?P<rest>.*)$")
 AUTO = re.compile(r"^(fn|lbl)_[0-9A-F]{8}$")
 CALLS = (elf.R_ARM_CALL, elf.R_ARM_JUMP24, elf.R_ARM_PC24)
+
+
+def names_in_sources():
+    """Analysis names (fn_/lbl_) that our sources use: renaming them would break the build."""
+    found = set()
+    for top in ("src", "include", "libs"):
+        for path in (ROOT / top).rglob("*"):
+            if path.suffix in (".c", ".cpp", ".h", ".hpp", ".inc", ".s"):
+                found.update(re.findall(r"\b(?:fn|lbl)_[0-9A-F]{8}\b", path.read_text(encoding="utf-8", errors="replace")))
+    return found
 
 
 def function_relocs(obj, name):
@@ -113,6 +124,7 @@ def main() -> None:
         for real in reals:
             owners[real].add(target)
 
+    in_sources = names_in_sources()
     renamed, skipped = [], collections.Counter()
     for target in sorted(proposals):
         reals = proposals[target]
@@ -128,6 +140,10 @@ def main() -> None:
         if real in used:
             skipped["name already in symbols.txt"] += 1
             print(f"  {real} already in symbols.txt, not given to {target}")
+            continue
+        if target in in_sources:
+            skipped["analysis name used by our sources"] += 1
+            print(f"  {target} is used in src/, include/ or libs/: not renamed to {real}")
             continue
         if target not in index:
             skipped["target not in symbols.txt"] += 1

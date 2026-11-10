@@ -12,7 +12,8 @@ A name is applied only when:
   - symbols.txt has a function starting at that address whose name is still an
     analysis name (fn_<address>);
   - no other function of the sweep was found at the same address;
-  - the name is not already used by another symbol.
+  - the name is not already used by another symbol;
+  - our sources (src/, include/, libs/) do not use the analysis name.
 Functions whose size in symbols.txt differs from the compiled size are reported (the
 analysis bounds may be wrong); the size is corrected only with --fix-sizes.
 
@@ -31,6 +32,16 @@ ROOT = Path(__file__).resolve().parent.parent
 SYMBOLS = ROOT / "config" / "jpn" / "symbols.txt"
 LINE = re.compile(r"^(?P<name>\S+) = (?P<section>\.\w+):0x(?P<addr>[0-9A-Fa-f]+);(?P<rest>.*)$")
 AUTO = re.compile(r"^fn_[0-9A-F]{8}$")
+
+
+def names_in_sources():
+    """Analysis names (fn_/lbl_) that our sources use: renaming them would break the build."""
+    found = set()
+    for top in ("src", "include", "libs"):
+        for path in (ROOT / top).rglob("*"):
+            if path.suffix in (".c", ".cpp", ".h", ".hpp", ".inc", ".s"):
+                found.update(re.findall(r"\b(?:fn|lbl)_[0-9A-F]{8}\b", path.read_text(encoding="utf-8", errors="replace")))
+    return found
 
 
 def main() -> None:
@@ -60,6 +71,7 @@ def main() -> None:
         if "type:function" in m["rest"]:
             by_addr[int(m["addr"], 16)] = i
 
+    in_sources = names_in_sources()
     renamed, skipped = 0, collections.Counter()
     size_notes = []
     for name, (addr, size) in sorted(found.items(), key=lambda kv: kv[1][0]):
@@ -72,6 +84,10 @@ def main() -> None:
             print(f"  no function at 0x{addr:08X} for {name}")
             continue
         m = LINE.match(lines[i])
+        if m["name"] in in_sources:
+            skipped["analysis name used by our sources"] += 1
+            print(f"  {m['name']} is used in src/, include/ or libs/: not renamed to {name}")
+            continue
         if not AUTO.match(m["name"]):
             skipped["already named" if m["name"] != name else "already this name"] += 1
             continue

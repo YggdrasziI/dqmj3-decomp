@@ -307,8 +307,10 @@ def mutate(L):
 
 
 def locate(symbol):
-    """Regex for the definition of a mangled or plain symbol (not in a // comment)."""
-    head = r"^(?!\s*//)[^\n;#]*\b"
+    """Regex for the definition of a mangled or plain symbol, written from column 0
+    (not in a // comment, not a call in a condition or a return)."""
+    # A definition starts at column 0; a line with a control keyword is a call site
+    head = r"^(?![ \t]|//)(?![^\n]*\b(?:if|while|for|switch|return)\b)[^\n;#]*\b"
     f = re.match(r"_Z(\d+)", symbol)
     if f:  # free function: _Z<length><name><parameters>
         name = symbol[f.end() : f.end() + int(f.group(1))]
@@ -329,6 +331,37 @@ def locate(symbol):
             return None
         name = rest[q.end() : q.end() + int(q.group(1))]
     return head + r"%s::%s\([^;{]*\{\n" % (cls, re.escape(name))
+
+
+def body_end(text, start):
+    """Index just after the newline that follows the brace closing the body opened
+    right before `start`; braces in comments, strings and characters do not count."""
+    depth, i, n = 1, start, len(text)
+    while i < n:
+        c = text[i]
+        if text.startswith("//", i):
+            i = text.find("\n", i)
+            if i < 0:
+                return None
+        elif text.startswith("/*", i):
+            i = text.find("*/", i + 2)
+            if i < 0:
+                return None
+            i += 1
+        elif c in "\"'":
+            j = i + 1
+            while j < n and text[j] != c:
+                j += 2 if text[j] == "\\" else 1
+            i = j
+        elif c == "{":
+            depth += 1
+        elif c == "}":
+            depth -= 1
+            if depth == 0:
+                nl = text.find("\n", i)
+                return n if nl < 0 else nl + 1
+        i += 1
+    return None
 
 
 def diff_lines(unit, symbol):
@@ -465,7 +498,9 @@ def main():
     if not m:
         sys.exit("definition not found: " + o.symbol)
     s0 = m.end()
-    e = text.index("\n}\n", s0) + 1
+    e = body_end(text, s0)
+    if e is None:
+        sys.exit("end of the definition not found: " + o.symbol)
     pre, body, post = text[:s0], text[s0:e].split("\n")[:-1], text[e:]
     if o.focus is not None:
         global FOCUS
