@@ -15,7 +15,7 @@ Google Inc., **Apache-2.0**, notice kept, license in `LICENSES/Apache-2.0.txt`).
 | `configure.py` | version `jpn` (`CTR-P-BJ3J`); own objects and libraries (`game`, `squirrel`); progress categories game / sdk / nw / net / lib / unknown; progress image disabled; compiler and flags marked as placeholders |
 | `tools/ctr/analyze.py` | after ARM code, a Thumb guess needs a Thumb `push` prologue (`is_thumb_prologue`) |
 | `tools/ctr/report_accounting.py` | BigRed's total code size check removed |
-| `tools/project.py` | report command chained through `cmd /s /c` on Windows; armcc started with a native path on Windows |
+| `tools/project.py` | report command chained through `cmd /s /c` on Windows; report generated with `functionRelocDiffs=name_address`; armcc started with a native path on Windows |
 | `tools/ctr/linker.py` | data sections with only unknown local symbols (`__FUNCTION__`) placed like sections without symbols |
 | `tools/ctr/link.py` | `parse_intermixed_args` (Python 3.12 left the units after the options unparsed) |
 | `tools/ctr/prelink.py` | drops `R_ARM_NONE` relocations; renames template sections `t.<name>` to `i.<name>` |
@@ -56,6 +56,7 @@ Source: the owner's DQMJ2 decompilation (`YggdrasziI/dqmj2-decomp`, CC0-1.0), co
 | File | Purpose |
 |---|---|
 | `tools/disasm.py` | disassembly of functions of the original image, through objdiff-cli |
+| `tools/reloc_names.py` | names the analysis symbols that matched functions call or refer to, from the relocations of our objects |
 | `tools/sweep_names.py` | names `symbols.txt` functions from a `compiler_sweep.py --json` result |
 
 ## Project documents
