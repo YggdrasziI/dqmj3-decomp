@@ -1,0 +1,56 @@
+name: Build
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  build:
+    # This is a *private* build container (YggdrasziI/dqmj3-decomp-build): it holds
+    # the game's code.bin in /extract, the armcc compilers in /compilers and wibo.
+    container: ghcr.io/yggdraszii/dqmj3-decomp-build:main
+
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        version: [jpn]
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Prepare
+        run: cp /extract/code_${{ matrix.version }}.bin orig/${{ matrix.version }}/code.bin
+
+      # Compile, link, check code.bin against its SHA-1, split, report.
+      # objdiff-cli is downloaded at the version pinned in configure.py.
+      - name: Build
+        run: |
+          python configure.py --version ${{ matrix.version }} --compilers /compilers
+          ninja
+
+      # On failure, keep our compiled objects (our own code, no game bytes) to compare
+      # with a local build
+      - name: Upload objects on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.version }}_objects
+          path: build/${{ matrix.version }}/src
+
+      # Draw the progress badges (nothing is committed by CI)
+      - name: Progress badges
+        run: python tools/progress_badges.py --version ${{ matrix.version }} --out build/${{ matrix.version }}/progress_badges
+
+      - name: Upload progress badges
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.version }}_progress
+          path: build/${{ matrix.version }}/progress_badges
+
+      - name: Upload report
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.version }}_report
+          path: build/${{ matrix.version }}/tracker/report.json
