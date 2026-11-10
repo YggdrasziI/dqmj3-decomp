@@ -26,6 +26,26 @@ for every boundary. A boundary is a hypothesis until a unit on each side matches
   `FieldScriptFunc.cpp` 0x00251FE8-0x0025D0A0 (186 functions); bounds of the
   functions that pass the file name, not of the files.
 
+## Code order: runs sorted by mangled name (2026-11-10)
+
+Known function names (273 in `symbols.txt` plus the 326 script bindings, named by the
+`__FUNCTION__` string they pass) sorted by address fall into 26 runs in which the
+mangled names ascend, for example:
+
+- `FieldScriptFunc.cpp`: its 186 bindings at 0x00251FE8-0x0025D0A0 are in strict
+  mangled-name order (185 of 185 pairs ascend: `_Z10ChangeMap_P4SQVM` ... `_Z9GetAlpha_P4SQVM`);
+  the run goes on with Squirrel functions up to `SQNativeClosure::Release` at 0x0026BEAC.
+- `BattleScriptFunc.cpp`: 138 of 139 pairs ascend at 0x0012D8E0-0x00141E40; the run ends
+  with `sq_open` (Squirrel).
+- Squirrel's `sqapi.cpp` functions are in several runs (`sq_call` ... `sq_writeclosure`
+  at 0x00154380-0x00154974, `sq_compile` ... `sq_set` at 0x00160EC8-0x001613CC).
+
+So within a run, game and library functions are mixed in name order, and a library is
+not one address range: `[[regions]]` by address can not separate Squirrel from the game
+code around it. What delimits a run is not known (hypotheses: an armlink `--sort`
+within groups of input sections, or partial links sorted one by one). The 26 run
+bounds are only where two known names are out of order, not proven unit bounds.
+
 ## Units
 
 | Unit | Range | Content | Status |
