@@ -307,9 +307,11 @@ def generate_build_ninja(
         n.comment("Progress")
         n.rule(
             "report",
-            # ninja runs commands without a shell on Windows: chain them through cmd
+            # ninja runs commands without a shell on Windows: chain them through cmd.
+            # The report ignores relocation targets by default (functionRelocDiffs=none):
+            # a call to another function would still count as a match.
             command=(lambda c: f'cmd /s /c "{c}"' if is_windows() else c)(
-                f'"{objdiff}" report generate -o $out && '
+                f'"{objdiff}" report generate -c functionRelocDiffs=name_address -o $out && '
                 f"$python {unix(ctr / 'report_accounting.py')} {unix(version.path)} $out --standard-output $standard"),
             description="REPORT",
         )

@@ -31,4 +31,4 @@ for every boundary. A boundary is a hypothesis until a unit on each side matches
 | Unit | Range | Content | Status |
 |---|---|---|---|
 | `game/FieldScriptFunc.cpp` | `.text` 0x002546FC-0x00254784, `.rodata` 0x00725800-0x0072580F | `SetFogDensity_` and its `__FUNCTION__` string | Matching (2026-11-10) |
-| `squirrel/<file>.cpp` (11 files, `libs/squirrel/`) | 128 `.text` ranges | the 224 functions found by the sweep, each claimed by the file the sweep compiled it from | NonMatching: all 224 at 100 % in objdiff; the rest of each file differs from the game or is not located yet, and linking needs every referenced symbol named (`sq_vm_malloc` first) |
+| `squirrel/<file>.cpp` (11 files, `libs/squirrel/`) | 128 `.text` ranges | the 224 functions found by the sweep, each claimed by the file the sweep compiled it from | NonMatching: 217 of 224 at 100 % in objdiff with relocation targets compared; the 7 others refer to long string literals (`.constdata`), whose `.rodata` ranges are not claimed yet; the rest of each file differs from the game or is not located yet |
