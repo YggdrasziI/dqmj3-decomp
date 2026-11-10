@@ -61,11 +61,35 @@ into 0x003F0000-0x004C0000 gives sharp edges:
 - end: 0.32 up to 0x004C81EC, 0.02-0.08 from 0x004C81F0.
 
 So a self-contained block of about 0x003E9A00-0x004C8000 (0.9 MB) holds the NEX
-version string and 11 of the 12 PIA markers: likely the network libraries (NEX, PIA,
-perhaps more). Hypothesis: the edges are statistical, not function-exact, and the
-block makes 6,257 calls inside and 4,074 to 667 functions outside it (runtime, SDK and helpers placed in the
-sorted runs). The game-side callers of PIA (0x005D0000, 0x00620000-0x00630000) are
-outside it.
+version string and 11 of the 12 PIA markers: likely the network libraries. It makes
+6,257 calls inside and 4,074 to 667 functions outside it (runtime, SDK and helpers
+placed in the sorted runs). The game-side callers of PIA (0x005D0000,
+0x00620000-0x00630000) are outside it.
+
+Refined with a wider core (`--core 0x3E0000-0x4C8000 --group 1`) and the 3DS service
+names the code passes to `srv` (`tools/link_density.py`, strings with their user
+function):
+
+| Function | Service | Place in the block |
+|---|---|---|
+| 0x003E0AE4 | `ac:u` (`.rodata` 0x00735C00) | first function linked to the block; none of the 32 functions before it is |
+| 0x003E7844 | `cecd:u` | before the NEX/PIA part |
+| 0x004A35F0 | `ssl:C` | after the last function that refers to the NEX/PIA data (0x004A5434) |
+| 0x004A7598, 0x004A94AC, 0x004AA13C, 0x004AED5C | `boss:U`, `http:C` (twice), `soc:U` | |
+| 0x004B1440 | `frd:u` (inline string) | |
+| 0x004C6184 | - | last function linked to the block; none of 0x004C6250-0x004C8000 is |
+
+NEX/PIA data: the functions of 0x003F0000-0x004C0000 own several `.rodata`, `.data`
+and `.bss` ranges (blocks of 1 KiB referenced at least 80% by them: 0x0073CC00-0x0073E400,
+0x00749000-0x0074AC00, 0x007ACC00-0x007AE000, 0x0080FC00-0x00810000, 0x0083B800-0x0083C400,
+...), not one contiguous range. Functions referring to them run from 0x003E9F74 to
+0x004A5434 (plus 100 outside the block, in game regions).
+
+Hypothesis: the block 0x003E0AE4-0x004C6250 is prebuilt network code in link order:
+CTR-SDK clients (`nn::ac`, `nn::cecd`), NEX and PIA, then CTR-SDK clients (`nn::ssl`,
+`nn::boss`, `nn::http`, `nn::socket`, `nn::friends`). Edges within a few functions; no
+matched unit proves them. Other service clients lie elsewhere: `ndm:u` 0x0010AFE0,
+`fs:USER` 0x001132B0, `dsp::DSP` 0x00121C20, `ir:USER` 0x0017FA48.
 
 No `[[regions]]` from these: no bound is proven.
 
