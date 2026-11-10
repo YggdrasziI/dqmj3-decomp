@@ -201,6 +201,11 @@ never labelled.
   `push`. Without that rule the data islands of `.text` (pointer tables, UTF-16 strings, around
   0x00640000-0x006C0000) were tiled as Thumb code: 65,632 functions, 26,127 of them Thumb. With it: 34,058
   functions, 332 Thumb.
+- `tools/ctr/arm.py`: code after a call that does not return (`bl longjmp`) runs into the literal pool, and a
+  walk could decode the pool (and an inline string after it) as code before reaching the `ldr` that loads
+  it. When a word ends up both code and pool data, the function is walked again with those words known to
+  be data. In `SQCompiler::PrefixedExpr` the split object marked them as code, and objdiff disassembled
+  them.
 - `tools/project.py`: the report command runs through `cmd /s /c` on Windows, where ninja starts commands
   without a shell.
 - `tools/ctr/report_accounting.py`: the check of BigRed's total code size is removed.

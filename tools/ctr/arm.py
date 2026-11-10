@@ -306,9 +306,11 @@ class FunctionInfo:
     ldr_pool: Set[int] = field(default_factory=set)
     # Decoding ran into something that is not plausible code
     suspicious: bool = False
+    # Words an earlier walk decoded as code before finding they are loaded as data
+    data_stops: Set[int] = field(default_factory=set)
 
     def is_data(self, addr: int) -> bool:
-        return (addr & ~3) in self.data_words
+        return (addr & ~3) in self.data_words or (addr & ~3) in self.data_stops
 
     def add_pool(self, addr: int, size: int) -> None:
         if size > self.pool.get(addr, 0):
@@ -344,12 +346,24 @@ class Analyzer:
         self.is_function = is_function
 
     def analyze(self, start: int, limit: int, thumb: bool) -> FunctionInfo:
-        info = FunctionInfo(start, limit, thumb)
-        if thumb:
-            self._walk_thumb(info)
-        else:
-            self._walk_arm(info)
-        return info
+        """
+        A walk can decode a literal pool as code before it reaches the load that
+        makes it data: code after a call that does not return (`bl longjmp`) runs
+        straight into the pool. The walk is then repeated with those words known to
+        be data, until no word is both.
+        """
+        stops: Set[int] = set()
+        while True:
+            info = FunctionInfo(start, limit, thumb)
+            info.data_stops = stops
+            if thumb:
+                self._walk_thumb(info)
+            else:
+                self._walk_arm(info)
+            conflicts = {addr & ~3 for addr in info.code if (addr & ~3) in info.data_words}
+            if not conflicts or conflicts <= stops:
+                return info
+            stops = stops | conflicts
 
     # ARM
 

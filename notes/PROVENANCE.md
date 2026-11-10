@@ -17,13 +17,14 @@ Google Inc., **Apache-2.0**, notice kept, license in `LICENSES/Apache-2.0.txt`).
 | `tools/ctr/report_accounting.py` | BigRed's total code size check removed; data objects in `.text` counted for their size |
 | `tools/project.py` | report command chained through `cmd /s /c` on Windows; report generated with `functionRelocDiffs=name_address`; armcc started with a native path on Windows |
 | `tools/ctr/linker.py` | data sections with only unknown local symbols (`__FUNCTION__`) placed like sections without symbols; the literal lookup of `locate_string` moved to `StringPool.literal_containing` |
+| `tools/ctr/arm.py` | a function is walked again when a word was decoded as code before being found as literal pool data |
 | `tools/ctr/split.py`, `tools/ctr/image.py` | `[init_array]` in `config.toml`: the static initializer table is split into `.init_array` sections with `R_ARM_TARGET1` relocations; `split.py`: a pointer is a string reference only when `StringPool.locate` gives back its address |
 | `tools/ctr/link.py` | `parse_intermixed_args` (Python 3.12 left the units after the options unparsed) |
 | `tools/ctr/prelink.py` | drops `R_ARM_NONE` relocations; renames template sections `t.<name>` to `i.<name>`; rewrites the addends of string pointers in data to the layout of split objects |
 | `tools/ctr/strpool.py` | padding (zero, 0xFF) between strings skipped; a pointer to a terminator is the empty string; `literal_containing` |
 | `tools/download_tool.py` | generic User-Agent |
 | `tools/ctr/*.py`, `tools/progress_image.py` | `usa` → `jpn` in usage strings |
-| `tools/__init__.py`, `decompctx.py`, `ninja_syntax.py`, `tools/ctr/{arm,check,elf,symbols,units}.py` | none beyond the line above |
+| `tools/__init__.py`, `decompctx.py`, `ninja_syntax.py`, `tools/ctr/{check,elf,symbols,units}.py` | none beyond the line above |
 | `notes/BUILD_SYSTEM.md` | from `docs/build_system.md`: NSMB2 facts removed or marked, changes of this project added |
 | `.editorconfig`, `.gitattributes`, `.clang-format`, `LICENSE` | none |
 
