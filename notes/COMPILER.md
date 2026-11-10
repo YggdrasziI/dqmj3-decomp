@@ -23,25 +23,27 @@ example 4.1 builds between 921 and 1049) cannot be ruled out.
 
 Sweeps by `tools/compiler_sweep.py` (2026-11-10): reference sources are compiled with
 each build, relocated words are masked, and each function is searched for in `.text`.
-A function counts when it is found at exactly one address.
+A function counts when it is found at exactly one address. Masking: the 24-bit offset
+of ARM `bl`/`b` (condition and opcode kept), both halves of a Thumb `bl`, and every
+word with a data relocation.
 
 ### Squirrel 2.2.5 (compiled with the game)
 
 `"Squirrel 2.2.5 stable"` at 0x00155C40. Source: the 2.2.5 stable release
 (`squirrel_2.2.5_stable.tar.gz`, zlib license), the 11 files of `squirrel/`, flags of
-`configure.py` plus `--no_dep_name`. 385 functions compiled.
+`configure.py` plus `--no_dep_name`. 385 functions compiled (383 with b921).
 
 | Build | Functions found |
 |---|---|
-| 4.0 b771, b821, b865 | 35 |
-| 4.0 b902, 4.1 b561 | 36 |
-| 4.1 b713 | 218 |
-| 4.1 b791 | 235 |
-| 4.1 b844 | 239 |
-| 4.1 b894 | 234 |
-| **4.1 b921** | **244** |
-| 4.1 b1049, b1440, b1454 | 240 (the same 240) |
-| 5.04 b82 | 76 |
+| 4.0 b771, b821, b865 | 31 |
+| 4.0 b902, 4.1 b561 | 32 |
+| 4.1 b713 | 201 |
+| 4.1 b791 | 217 |
+| 4.1 b844 | 220 |
+| 4.1 b894 | 218 |
+| **4.1 b921** | **224** |
+| 4.1 b1049, b1440, b1454 | 221 (the same 221) |
+| 5.04 b82 | 71 |
 
 Build 921 finds every function the other 4.1 builds find. Outside 4.1, three functions
 are found that b921 does not find at a single address: `weakref_ref` and
@@ -51,16 +53,23 @@ ambiguous with b921), and `__sti___11_sqstate_cpp__null_` (the static initialize
 other builds out:
 
 - found with b921 but not b1049 / b1440 / b1454: `SQFunctionProto::Load` (0x002694FC,
-  9344 bytes), `SQCompiler::CreateFunction` (0x0019B970, 1104 bytes),
-  `SQCompiler::CompExp` (0x0019D620), `SQCompiler::BitwiseAndExp` (0x001C174C);
-- found with b921 but not b894 (10), among them `SQVM::ARITH_OP` (0x0019774C, 944
-  bytes, b921 and later only), `SQCompiler::PrefixedExpr` (0x00199330, 1984 bytes),
-  `SQLexer::ReadString` (0x00190DAC, 2248 bytes).
+  9644 bytes), `SQCompiler::CompExp` (0x0019D620, 540 bytes),
+  `SQCompiler::BitwiseAndExp` (0x001C174C, 192 bytes);
+- found with b921 but not b894 (6): `SQVM::ARITH_OP` (0x0019774C, 952 bytes, b921 and
+  later only), `SQVM::FallBackGet` (0x0018DEFC, 1224 bytes),
+  `SQFuncState::AddInstruction` (0x0019DB7C, 876 bytes), `CompExp`, `IdType2Name`,
+  `SQSharedState::MarkObject`;
+- every function found by another 4.1 build or by 5.04 is also found by b921.
 
-Flags, with b921 (functions found): base flags 244; `-O3 -Ospace` 36; `-O2 -Otime` 53;
-without `--fpmode=fast` 243; without `--signed_chars` 235; without `--no_rtti` 244.
+An earlier version of the sweep masked whole branch words; it counted 244 functions
+with b921 and some false positives (a `b` taken for a `bl`), now gone.
 
-The 244 functions cover 96,284 bytes; 15 more are found at several addresses. The rest
+Flags, with b921 (functions found): base flags 224; `-O3 -Ospace` 30; `-O2 -Otime` 51;
+without `--fpmode=fast` 223; without `--signed_chars` 219; without `--no_rtti` 224.
+
+The 224 functions cover 88,592 bytes; 12 more are found at several addresses (small
+identical bodies). 222 of the 224 are named in `symbols.txt` by `tools/sweep_names.py`
+(the other two already had their name). The rest
 differ (game changes to Squirrel, inlining across files, or code the linker removed) and
 are not analysed yet.
 
@@ -94,7 +103,7 @@ matches with 4.0 and 5.04).
 |---|---|
 | CTR-SDK | `nn::` error strings, e.g. `nn::ac::Initialize() failed` at 0x001ABA78 |
 | zlib 1.2.7 (SDK build) | version string at 0x0047AFF4; functions above |
-| Squirrel 2.2.5 | version string at 0x00155C40; 244 functions above |
+| Squirrel 2.2.5 | version string at 0x00155C40; 224 functions above |
 | NEX and PIA | `nn::nex::RootTransport` at 0x0074A596; `NN_PIA_SESSION_MAX_SILENCE_TIME_MAX` at 0x0073E509 |
 | NintendoWare for CTR | `battle_font_0.bflim` at 0x007B3988, `break_font.bffnt` at 0x007BDBB0, `Eft_Ptcl_PlaneXY.vsh` at 0x007535A6 |
 | Square Enix online library ("SIL") | `X-Sil-Version` at 0x0057918C, `dqmj3ds.sil2.square-enix.com` at 0x007BF80C |

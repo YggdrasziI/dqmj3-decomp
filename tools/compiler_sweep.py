@@ -18,8 +18,9 @@ Usage:
 Matching rules:
   - each function is taken from its own section (armcc --split_sections), literal
     pool included;
-  - words with a relocation are masked entirely: armlink may have replaced a call
-    with `mov r0, r0` or with the called instruction, and addresses differ anyway;
+  - relocated words are masked: data words entirely, ARM branches except for their
+    condition and opcode (so that `b` and `bl` stay apart). A call that armlink
+    replaced with `mov r0, r0` or with the called instruction is therefore not found;
   - only functions of at least --min-size bytes with at least 3 unmasked words are
     searched, at 4-byte (ARM) or 2-byte (Thumb) alignment in .text;
   - a function found at more than one address is counted as ambiguous, not a match.
@@ -132,9 +133,16 @@ def functions_of(path: Path, min_size: int):
             continue
         mask = bytearray(b"\xff" * len(data))
         for rel in sec.relocs:
-            start = rel.offset & ~3 if rel.type not in (elf.R_ARM_THM_CALL, elf.R_ARM_THM_JUMP24) else rel.offset
-            for i in range(start, min(start + 4, len(data))):
-                mask[i] = 0
+            if rel.type in (elf.R_ARM_CALL, elf.R_ARM_JUMP24, elf.R_ARM_PC24):
+                # Keep the condition and opcode: a `b` must not match a `bl`
+                masked = range(rel.offset, rel.offset + 3)
+            elif rel.type in (elf.R_ARM_THM_CALL, elf.R_ARM_THM_JUMP24):
+                masked = range(rel.offset, rel.offset + 4)
+            else:
+                masked = range(rel.offset & ~3, (rel.offset & ~3) + 4)
+            for i in masked:
+                if i < len(data):
+                    mask[i] = 0
         if sum(1 for i in range(0, len(mask) - 3, 4) if mask[i:i + 4] == b"\xff\xff\xff\xff") < 3:
             continue
         yield sym.name, bool(sym.value & 1), bytes(data), bytes(mask)
@@ -225,7 +233,9 @@ def main() -> None:
                         failed += 1
                         continue
                     for name, size, hits in found:
-                        entry = results.setdefault(name, {"size": size, "source": str(source)})
+                        entry = results.setdefault(name, {"size": size, "source": str(source), "sizes": {}})
+                        # The size can differ between builds; "size" is the first one seen
+                        entry["sizes"][build] = size
                         entry[build] = (f"0x{hits[0]:08X}" if len(hits) == 1
                                         else "ambiguous" if hits else None)
             failures[build] = failed
