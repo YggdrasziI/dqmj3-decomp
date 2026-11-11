@@ -38,7 +38,9 @@ Each is a lead for the region map, not yet an attribution:
 
 - **CTR-SDK** (`nn::`): `nn::ac`, `nn::friends`, `nn::http`, ... (error strings such as
   `nn::ac::Initialize() failed`).
-- **zlib**, built by Nintendo for the SDK: version string `1.2.7.f-NINTENDO-CTR-SDK-v1`.
+- **zlib**, two copies: the SDK's (version string `1.2.7.f-NINTENDO-CTR-SDK-v1`,
+  `libs/zlib/` from the public 1.2.7) and a zlib 1.2.5 called from the network code
+  (`notes/COMPILER.md`).
 - **NEX** (`nn::nex`, online services) and **PIA** (`NN_PIA_SESSION_...`, peer-to-peer
   sessions).
 - **NintendoWare for CTR**: file names `.bflim` (layout images), `.bffnt` (fonts), and
@@ -108,7 +110,7 @@ Evidence and the candidate analysis go in `notes/COMPILER.md`. How the build wor
   address (`fn_<addr>`, mangled as a member when the class is known).
 - Library code under `libs/<lib>/{include,src}` (`nn`, `nw`, `rvct`, `zlib`, `nex`,
   `pia`, ...; each library sets its `src_dir` in `configure.py`; a public source copied
-  as is keeps its own layout, as `libs/squirrel/{include,squirrel}`), with the library's
+  as is keeps its own layout, as `libs/squirrel/{include,squirrel}` and `libs/zlib/`), with the library's
   real names once identified by signature or a reference project. Starting point for
   `nn::`: zeldaret/3ds_sdk (CC0).
 - A unit's name in `splits.txt` is its source path relative to that `src_dir`
@@ -119,7 +121,8 @@ Evidence and the candidate analysis go in `notes/COMPILER.md`. How the build wor
 
 ```
 README.md SPEC.md LICENSE LICENSES/   CC0-1.0; Apache-2.0 for tools/ninja_syntax.py;
-                                      zlib for libs/squirrel/ (notes/PROVENANCE.md)
+                                      zlib for libs/squirrel/ and libs/zlib/
+                                      (notes/PROVENANCE.md)
 configure.py                          project description, generates build.ninja
 config/jpn/                           config.toml, symbols.txt, splits.txt
 orig/jpn/code.bin                     decompressed .code of the user's dump (git-ignored)

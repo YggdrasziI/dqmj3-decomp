@@ -73,15 +73,43 @@ identical bodies). 222 of the 224 are named in `symbols.txt` by `tools/sweep_nam
 differ (game changes to Squirrel, inlining across files, or code the linker removed) and
 are not analysed yet.
 
-### zlib 1.2.7 (CTR-SDK build)
+### zlib: two copies (2026-11-11)
 
-Version string `1.2.7.f-NINTENDO-CTR-SDK-v1` at 0x0047AFF4. Source: zlib 1.2.7 (public
-release), `-DZ_SOLO`, `--c90` and the C flags of `configure.py`. 60 functions compiled
-with `-O3 -Otime`; `-O3 -Ospace` and `-O2 -Ospace` find none, `-O2 -Otime` one.
+The image links **two zlib copies**, whose functions are interleaved by the name sort of
+0x00694000-0x006B2000. The first sweep (zlib 1.2.7 with `-DZ_SOLO`, 11 functions) mixed
+them; functions that are the same in 1.2.5 and 1.2.7 can only be told apart by their
+calls. Calls (`BL`, `B` and function pointers in literal pools) inside that window form
+two components with no link between them:
 
-- `build_tree` (0x006951B4, 1928 bytes): builds 921, 1049, 1440, 1454 only.
-- `inflate_fast` (0x006A51E4, 2192 bytes): 894 and later.
-- 4.0 and 4.1 b561: none of the 11.
+- **CTR-SDK zlib 1.2.7** (`1.2.7.f-NINTENDO-CTR-SDK-v1`, 5 copies of the string: inline
+  at 0x0047AFF4, 0x0047C1D8, 0x0056C0B4 and in `.rodata` at 0x0073667C, 0x00736698).
+  The functions that pass that string (0x003E1538, 0x003E1604, 0x0047AEF8, 0x0047C14C,
+  0x0056BFD4, 0x0056C0D0) call this copy. Its exported functions start with a `mov r0,
+  r0` word that callers branch to (0x0069D0C8, 0x0069D1C8, 0x0069D6BC, 0x0069F088,
+  0x0069F0D8, 0x0069F240). Its `inflateInit2_` (0x0069F0DC) and deflate init
+  (0x0069D2AC) point to an 8-byte default allocator, `mul r0, r1, r2; b fn_002FE59C`
+  (0x006A0010): `zcalloc` of 1.2.7 built **without** `Z_SOLO` (with `Z_SOLO` there is no
+  default allocator). Source: zlib 1.2.7, no `Z_SOLO`, `zconf.h` without
+  `<sys/types.h>` (armcc 4.1 has none), `--c90` and the C flags of `configure.py`.
+  Found with build 921: `_tr_align`, `_tr_flush_bits`, `_tr_init`, `_tr_stored_block`,
+  `inflateInit_`, `inflateReset`, `deflateBound`; `inflateInit2_` is named from the tail
+  call of `inflateInit_` but differs from the public source (0x164 bytes, 0x144 in 1.2.7).
+- **zlib 1.2.5**: called from the network block (0x0040F940, which refers to the string
+  `1.2.5` at 0x0073C75C, calls `deflateInit2_` 0x006A3248). zlib 1.2.5 (public release)
+  with the same flags (an empty `sys/types.h` on the include path) finds 20 functions with
+  build 921 (22 with 1049, 1440, 1454; 19 with 894), all in this component:
+  `deflate_fast` 0x006974D4, `deflate_slow` 0x00698264, `deflate_stored` 0x00698B94,
+  `fill_window` 0x0069912C, `flush_pending` 0x006994F0, `deflateInit2_` 0x006A3248,
+  `deflateReset` 0x006A34D4, `inflateInit2_` 0x006A500C, `inflateReset` 0x006A5150,
+  `inflate_fast` 0x006A51E4, `updatewindow` 0x006B0CA8, `build_tree` 0x006951B4,
+  `compress_block` 0x00695E8C, `send_tree` 0x006A6718, `_tr_align` 0x006A0B2C,
+  `_tr_flush_block` 0x006A0E2C, `_tr_init` 0x006A153C, `_tr_stored_block` 0x006A168C. Its
+  default allocator is 0x006A5F60. Not named: two copies can not share a name in
+  `symbols.txt`, and the names of this copy (a prefix?) are not known.
+
+With 1.2.7: `-O3 -Ospace` and `-O2 -Ospace` find none, `-O2 -Otime` one; `build_tree`
+(1.2.5 copy) matches with builds 921, 1049, 1440, 1454 only, `inflate_fast` (1.2.5 copy)
+with 894 and later; 4.0 and 4.1 b561 find none of them.
 
 ### BigRed sources (New Super Mario Bros. 2)
 
@@ -103,6 +131,7 @@ matches with 4.0 and 5.04).
 |---|---|
 | CTR-SDK | `nn::` error strings, e.g. `nn::ac::Initialize() failed` at 0x001ABA78 |
 | zlib 1.2.7 (SDK build) | version string at 0x0047AFF4; functions above |
+| zlib 1.2.5 | string `1.2.5` at 0x0073C75C; functions above (second copy) |
 | Squirrel 2.2.5 | version string at 0x001557C0; 224 functions above |
 | NEX and PIA | `nn::nex::RootTransport` at 0x0074A596; `NN_PIA_SESSION_MAX_SILENCE_TIME_MAX` at 0x0073E509 |
 | NintendoWare for CTR | `battle_font_0.bflim` at 0x007B3988, `break_font.bffnt` at 0x007BDBB0, `Eft_Ptcl_PlaneXY.vsh` at 0x007535A6 |
@@ -122,7 +151,7 @@ No compiler identification string (`ARM C/C++ Compiler`, `RVCT`) is in `code.bin
 ```
 python tools/compiler_sweep.py --project <BigRed clone>
 python tools/compiler_sweep.py --flags "<flags> --no_dep_name" -I <sq>/include -I <sq>/squirrel <sq>/squirrel/*.cpp
-python tools/compiler_sweep.py --flags "--c90 --arm --cpu=MPCore --apcs=/interwork --split_sections -DZ_SOLO -O3 -Otime" -I <zlib> <zlib>/{adler32,crc32,deflate,inflate,inffast,inftrees,trees,zutil,compress,uncompr}.c
+python tools/compiler_sweep.py --flags "--c90 --arm --cpu=MPCore --apcs=/interwork --split_sections -O3 -Otime" -I <dir with an empty sys/types.h> -I <zlib> <zlib>/{adler32,crc32,deflate,inflate,inffast,inftrees,trees,zutil,compress,uncompr}.c
 ```
 
 Under Git Bash, set `MSYS_NO_PATHCONV=1` so that `/interwork` is not turned into a path.

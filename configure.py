@@ -171,6 +171,30 @@ config.libs = [
             )
         ],
     },
+    {
+        # zlib 1.2.7 (zlib license, libs/zlib/README) for the CTR-SDK copy of the image
+        # ("1.2.7.f-NINTENDO-CTR-SDK-v1"), built without Z_SOLO: its default allocator is
+        # there (zconf.h altered, armcc has no <sys/types.h>). A unit claims only the functions
+        # of that copy found byte for byte; the image also has a zlib 1.2.5 copy
+        # (notes/COMPILER.md, notes/SPLITS.md).
+        "lib": "zlib",
+        "src_dir": "libs",
+        "cflags": [
+            "--c90",
+            "--arm",
+            "--cpu=MPCore",
+            "--apcs=/interwork",
+            "--split_sections",
+            "-O3",
+            "-Otime",
+            "--no_dep_name",
+        ],
+        "progress_category": "lib",
+        "objects": [
+            Object(NonMatching, f"zlib/{name}.c")
+            for name in ("deflate", "inflate", "trees")
+        ],
+    },
 ]
 
 # Optional extra categories for progress tracking

@@ -42,6 +42,20 @@ Demichelis, **zlib license** (`libs/squirrel/COPYRIGHT`, copy in
 | `libs/squirrel/squirrel/sqobject.cpp` | altered (notice at the top): `SQArray::Extend` takes each element through a local reference (2026-11-10) |
 | `libs/squirrel/squirrel/sqarray.h` | altered (notice at the top): `SQArray::ShrinkIfNeeded` reads the capacity into a local (2026-11-10) |
 
+## zlib 1.2.7
+
+Source: [madler/zlib](https://github.com/madler/zlib) tag `v1.2.7` (commit
+`30a1c7065dc1dc2c2ed68ed403792b660bfdd805`, GitHub archive `v1.2.7.tar.gz` SHA-1
+`0e88ec14f594dec94b6dff66c2eddf5aae376d13`), Copyright (C) 1995-2012 Jean-loup Gailly and
+Mark Adler, **zlib license** (`libs/zlib/README`, copy in `LICENSES/Zlib-zlib.txt`). Copied
+on 2026-11-11 with the owner's approval: the library files of the release root
+(`*.c` and `*.h` without the `gz*` files, `README`).
+
+| Our files | Changes |
+|---|---|
+| `libs/zlib/*.{c,h}`, `libs/zlib/README` | none, except: |
+| `libs/zlib/zconf.h` | altered (notice at the top): `<sys/types.h>` not included (2026-11-11) |
+
 ## Scripts from DQMJ2
 
 Source: the owner's DQMJ2 decompilation (`YggdrasziI/dqmj2-decomp`, CC0-1.0), commit
