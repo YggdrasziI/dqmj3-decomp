@@ -16,7 +16,7 @@ Google Inc., **Apache-2.0**, notice kept, license in `LICENSES/Apache-2.0.txt`).
 | `tools/ctr/analyze.py` | after ARM code, a Thumb guess needs a Thumb `push` prologue (`is_thumb_prologue`) |
 | `tools/ctr/report_accounting.py` | BigRed's total code size check removed; data objects in `.text` counted for their size |
 | `tools/project.py` | report command chained through `cmd /s /c` on Windows; report generated with `functionRelocDiffs=name_address`; armcc started with a native path on Windows |
-| `tools/ctr/linker.py` | data sections with only unknown local symbols (`__FUNCTION__`) placed like sections without symbols; the literal lookup of `locate_string` moved to `StringPool.literal_containing`; calls to the functions in `inlined_functions` of `config.toml` replaced by their instruction, their compiled body checked (`inline_body` split out of `inline_call`) |
+| `tools/ctr/linker.py` | data sections with only unknown local symbols (`__FUNCTION__`) placed like sections without symbols; the literal lookup of `locate_string` moved to `StringPool.literal_containing`; calls to the functions in `inlined_functions` of `config.toml` replaced by their instruction, their compiled body checked (`inline_body` split out of `inline_call`); an instruction of `bx lr` is an empty function, inlined as `mov r0, r0` |
 | `tools/ctr/arm.py` | a function is walked again when a word was decoded as code before being found as literal pool data |
 | `tools/ctr/image.py` | `inlined_functions` in `config.toml` |
 | `tools/ctr/split.py`, `tools/ctr/image.py` | `[init_array]` in `config.toml`: the static initializer table is split into `.init_array` sections with `R_ARM_TARGET1` relocations; `split.py`: a pointer is a string reference only when `StringPool.locate` gives back its address |
@@ -56,6 +56,7 @@ on 2026-11-11 with the owner's approval: the library files of the release root
 |---|---|
 | `libs/zlib/*.{c,h}`, `libs/zlib/README` | none, except: |
 | `libs/zlib/zconf.h` | altered (notice at the top): `<sys/types.h>` not included (2026-11-11) |
+| `libs/zlib/inflate.c`, `libs/zlib/deflate.c` | altered (notice at the top): `inflateInit2_` and `deflateInit2_` first call `fn_inline_00104C54(0, 0x0400028B)` (a name of this project's convention) (2026-11-11) |
 
 ## Scripts from DQMJ2
 

@@ -106,14 +106,19 @@ two components with no link between them:
     1049, 1440 and 1454 find the same 20 functions.
 
   Source: zlib 1.2.7, no `Z_SOLO`, `zconf.h` without `<sys/types.h>` (armcc 4.1 has
-  none), `--c90`. With b1049 and `--cpu=MPCoreNoVFP`, 28 functions of the copy are at
-  100 % (`notes/SPLITS.md`). Not matched: `inflateInit2_` and `deflateInit2_`, which
-  each start with an added call `f(0, 0x0400028B)` to an empty function that armlink
-  inlined (`mov r0, #0; ldr r1, =0x0400028B; mov r0, r0`); its name is unknown. The same
-  call, with another constant (0x04000027-0x0400029A, each used once), starts 20 other
-  functions of SDK and network code (0x00104C48, 0x00113450 near the `fs:USER` client,
+  none), `--c90`. With b1049 and `--cpu=MPCoreNoVFP`, 30 functions of the copy are at
+  100 % (`notes/SPLITS.md`). `inflateInit2_` and `deflateInit2_` each start with an
+  added call `f(0, 0x0400028B)` to an empty function that armlink inlined (`mov r0, #0;
+  ldr r1, =0x0400028B; mov r0, r0`). The same call, with another constant
+  (0x04000000-0x0400029A, each used once), starts 21 other functions of SDK and network
+  code (first at 0x00104C54 in `fn_00104C48`; 0x00113450 near the `fs:USER` client,
   0x0017FA48, the `ir:USER` client...): likely a library-use marker of the CTR-SDK
-  (hypothesis). Every site is ARM and inlined, so no call shows the function.
+  (hypothesis; Kanken Training 2 has the same pattern, `notes/REFERENCES.md`). Every site
+  is ARM and inlined, so no call shows the function, and no reference project names it.
+  The two zlib functions call it as `fn_inline_00104C54`, **a name of this project's
+  convention, not evidence** (`SPEC.md`), listed in `inlined_functions` of `config.toml`
+  as an empty function; the source change is marked `DQMJ3` in `libs/zlib/inflate.c`
+  and `deflate.c`. That every site calls the same function is a hypothesis too.
 - **zlib 1.2.5**: called from the network block (0x0040F940, which refers to the string
   `1.2.5` at 0x0073C75C, calls `deflateInit2_` 0x006A3248). zlib 1.2.5 (public release)
   with the same flags (an empty `sys/types.h` on the include path) finds 20 functions with

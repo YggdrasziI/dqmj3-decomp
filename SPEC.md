@@ -108,6 +108,11 @@ Evidence and the candidate analysis go in `notes/COMPILER.md`. How the build wor
   string, that string is its name (`SetFogDensity_`).
 - Unknown classes and structs: `Unk<Name>` or `Unk<address>`; unknown methods keep the
   address (`fn_<addr>`, mangled as a member when the class is known).
+- A function with no body in the image (armlink inlined every call and removed it):
+  `fn_inline_<address of its first call site>`, listed in `inlined_functions` of
+  `config.toml`. This is a convention of this project, not evidence of anything:
+  replace it when the real name is proven. In use: `fn_inline_00104C54`
+  (`notes/COMPILER.md`).
 - Library code under `libs/<lib>/{include,src}` (`nn`, `nw`, `rvct`, `zlib`, `nex`,
   `pia`, ...; each library sets its `src_dir` in `configure.py`; a public source copied
   as is keeps its own layout, as `libs/squirrel/{include,squirrel}` and `libs/zlib/`), with the library's

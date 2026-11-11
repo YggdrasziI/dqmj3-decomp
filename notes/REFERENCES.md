@@ -18,6 +18,10 @@ first. Every reuse is logged in `notes/PROVENANCE.md`.
 - acnl-decomp (Animal Crossing: New Leaf): GCC build, not byte-matching. Reference for
   names only, never evidence.
 - mh4u-decomp (Monster Hunter 4 Ultimate): no code yet.
+- [mooki000/kanken-training-2-decomp](https://github.com/mooki000/kanken-training-2-decomp)
+  (Kanken Training 2, `CTR-P-B2KJ`, armcc matching decompilation, **GPL-3.0**): read only,
+  as an example; no code taken. Has the same CTR-SDK call `f(0, 0x0400xxxx)` to an empty
+  function inlined by armlink (`func_0014f7e8`, no real name either).
 
 ## Tools
 

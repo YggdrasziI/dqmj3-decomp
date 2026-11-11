@@ -1,3 +1,7 @@
+/*
+ * ALTERED SOURCE: changed to compile to the code of Dragon Quest Monsters: Joker 3;
+ * this is not the original zlib 1.2.7 source. Changes are marked "DQMJ3".
+ */
 /* deflate.c -- compress data using the deflation algorithm
  * Copyright (C) 1995-2012 Jean-loup Gailly and Mark Adler
  * For conditions of distribution and use, see copyright notice in zlib.h
@@ -210,6 +214,11 @@ int ZEXPORT deflateInit_(strm, level, version, stream_size)
 }
 
 /* ========================================================================= */
+/* DQMJ3: the CTR-SDK build calls an empty function first, which armlink inlined
+ * (mov r0, r0). Its real name is unknown: fn_inline_00104C54 is this project's
+ * convention, not evidence (notes/COMPILER.md). */
+extern void fn_inline_00104C54(unsigned int, unsigned int);
+
 int ZEXPORT deflateInit2_(strm, level, method, windowBits, memLevel, strategy,
                   version, stream_size)
     z_streamp strm;
@@ -229,6 +238,8 @@ int ZEXPORT deflateInit2_(strm, level, method, windowBits, memLevel, strategy,
     /* We overlay pending_buf and d_buf+l_buf. This works since the average
      * output size for (length,distance) codes is <= 24 bits.
      */
+
+    fn_inline_00104C54(0, 0x0400028B); /* DQMJ3 */
 
     if (version == Z_NULL || version[0] != my_version[0] ||
         stream_size != sizeof(z_stream)) {

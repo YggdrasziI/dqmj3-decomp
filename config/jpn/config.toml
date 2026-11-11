@@ -72,6 +72,15 @@ char_size = 2
 symbol = "_ZN11SQFuncState12GetStackSizeEv"
 instruction = 0xE5900008
 
+# An empty function that the CTR-SDK calls as f(0, <constant>) at the start of library
+# functions (0x0400028B in zlib's inflateInit2_ and deflateInit2_); every call was inlined
+# to mov r0, r0 and its body removed. The name is this project's convention (fn_inline_
+# and the address of the first call site, 0x00104C54), not evidence: notes/COMPILER.md.
+# An instruction of bx lr (0xE12FFF1E) is an empty function.
+[[inlined_functions]]
+symbol = "fn_inline_00104C54"
+instruction = 0xE12FFF1E
+
 # Static initializer table: 2,105 words at the end of .rodata, each the offset from
 # the word to an initializer function (+1 for Thumb). 2,103 point to the start of a
 # function in symbols.txt. Evidence in notes/SPLITS.md.

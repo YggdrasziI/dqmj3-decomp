@@ -219,8 +219,7 @@ zlib/deflate.c:
 	.text       start:0x0069946C end:0x006994F0
 	.text       start:0x0069BF70 end:0x0069D0C8
 	.text       start:0x0069D0CC end:0x0069D1C8
-	.text       start:0x0069D1CC end:0x0069D2AC
-	.text       start:0x0069D568 end:0x0069D6BC
+	.text       start:0x0069D1CC end:0x0069D6BC
 
 zlib/inffast.c:
 	.text       start:0x0069F304 end:0x0069FA70
@@ -228,6 +227,7 @@ zlib/inffast.c:
 zlib/inflate.c:
 	.text       start:0x0069D6C0 end:0x0069F088
 	.text       start:0x0069F08C end:0x0069F0D8
+	.text       start:0x0069F0DC end:0x0069F240
 	.text       start:0x0069F244 end:0x0069F304
 	.text       start:0x006B0B80 end:0x006B0CA8
 

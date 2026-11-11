@@ -140,7 +140,9 @@ body to read the replacement from. When it is defined in the caller's own object
 there. Otherwise it is listed in `inlined_functions` of `config.toml` with its instruction (in this game:
 `SQFuncState::GetStackSize`, called from `squirrel/sqcompiler.cpp`, defined in `squirrel/sqfuncstate.cpp`).
 The linker then replaces calls to it with that instruction, refuses a name that `symbols.txt` gives an
-address, and checks that any object defining the function compiles it to exactly that body.
+address, and checks that any object defining the function compiles it to exactly that body. An instruction
+of `bx lr` (0xE12FFF1E) means an empty function: its calls become `mov r0, r0` (in this game:
+`fn_inline_00104C54`, a name of our own, called from zlib's `inflateInit2_` and `deflateInit2_`).
 
 **Tail calls were turned into fallthrough** (`armlink --tailreorder` and `--branchnop`). Where it could, the
 linker placed a function that is tail called directly behind its caller and replaced the `b` between them
