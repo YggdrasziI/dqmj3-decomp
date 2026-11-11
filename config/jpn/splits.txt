@@ -13,6 +13,7 @@ squirrel/sqapi.cpp:
 	.text       start:0x00154380 end:0x00154A24
 	.text       start:0x00155644 end:0x00155668
 	.text       start:0x001557FC end:0x001558FC
+	.text       start:0x0015E3C8 end:0x0015E3CC
 	.text       start:0x00160EC8 end:0x00161474
 	.text       start:0x0016CC68 end:0x0016CC80
 	.text       start:0x0016CCC4 end:0x0016CCCC
