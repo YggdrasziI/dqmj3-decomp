@@ -25,7 +25,7 @@ for every boundary. A boundary is a hypothesis until a unit on each side matches
 - Functions found by the compiler sweeps (`notes/COMPILER.md`): Squirrel 2.2.5 (224,
   named in `symbols.txt`; spread over 0x00154000-0x006AE000, not one block), zlib in 0x00694000-0x006B2000, two copies interleaved by the name sort (CTR-SDK 1.2.7 and 1.2.5, `notes/COMPILER.md`).
 - Script bindings: `BattleScriptFunc.cpp` 0x0012D8E0-0x00148AE0 (140 functions),
-  `FieldScriptFunc.cpp` 0x00251FE8-0x0025D0A0 (186 functions); bounds of the
+  `FieldScriptFunc.cpp` 0x00251FE8-0x0025D13C (186 functions); bounds of the
   functions that pass the file name, not of the files.
 
 ## Network libraries (NEX, PIA): leads (2026-11-10)
@@ -234,7 +234,7 @@ Known function names (273 in `symbols.txt` plus the 326 script bindings, named b
 `__FUNCTION__` string they pass) sorted by address fall into 26 runs in which the
 mangled names ascend, for example:
 
-- `FieldScriptFunc.cpp`: its 186 bindings at 0x00251FE8-0x0025D0A0 are in strict
+- `FieldScriptFunc.cpp`: its 186 bindings at 0x00251FE8-0x0025D13C are in strict
   mangled-name order (185 of 185 pairs ascend: `_Z10ChangeMap_P4SQVM` ... `_Z9GetAlpha_P4SQVM`);
   the run goes on with Squirrel functions up to `SQNativeClosure::Release` at 0x0026BEAC.
 - `BattleScriptFunc.cpp`: 138 of 139 pairs ascend at 0x0012D8E0-0x00141E40; the run ends
@@ -275,7 +275,7 @@ named from their `__FUNCTION__` string):
 
 | Unit | Range | Content | Status |
 |---|---|---|---|
-| `game/FieldScriptFunc.cpp` | `.text` 0x002546FC-0x00254784, `.rodata` 0x00725800-0x0072580F | `SetFogDensity_` and its `__FUNCTION__` string | Matching (2026-11-10) |
+| `game/FieldScriptFunc.cpp` | 46 `.text` ranges in 0x00251FE8-0x0025D13C (`config/jpn/splits.txt`), `.rodata` 0x00724B18-0x00725871 (the file's `__FUNCTION__` strings) | the 186 bindings that pass `FieldScriptFunc.cpp` and their own `__FUNCTION__` string; the strings are one block in source order, so the unit claims all 186 at once; the bindings without an error path between them are not claimed (nothing ties them to the file) | NonMatching (2026-11-11): 181 of 186 at 100 %, `.rodata` at 100 %; `GetPos_` 92.8 %, `SetTalkCameraEyeOffset_` and `SetTalkCameraTargetOffset_` 91.9 %, `GetCrackNPCMessageTag_` 99.4 %, `SetAnalyzeInfo_` 99.2 % (differences above each function) |
 | `squirrel/sqdebug.cpp` | 0x0018E3C4-0x0018E704, 0x00197438-0x0019774C, 0x006AE8CC-0x006AE9C4 | 7 functions (`SQVM::PrintObjVal`, both `SQVM::Raise_Error`, `Raise_IdxError`, `Raise_CompareError`, `Raise_ParamTypeError`, `sq_stackinfos`); `sq_getfunctioninfo` is not in the game (removed by armlink) | Matching (2026-11-10) |
 | `squirrel/sqstate.cpp` | 13 `.text` ranges, `.rodata` 0x007CE0B0-0x007CE0B4 (its `.init_array` entry), `.data` 0x008108F8-0x00810920 | 14 functions with `__sti___11_sqstate_cpp`, and `_null_`, `_true_`, `_false_`, `_one_`, `_minusone_` | Matching (2026-11-10) |
 | `squirrel/sqtable.cpp` | 8 `.text` ranges, `.rodata` 0x007A7E34-0x007A7E54 (`_ZTV7SQTable`) | 14 functions and the vtable; its slots named `SQTable::~SQTable` and `SQTable::Finalize`; `D0` is 0 in the original (removed) | Matching (2026-11-10) |

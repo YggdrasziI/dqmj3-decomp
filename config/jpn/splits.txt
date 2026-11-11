@@ -5,8 +5,53 @@ Sections:
 	.bss        type:bss align:4
 
 game/FieldScriptFunc.cpp:
-	.text       start:0x002546FC end:0x00254784
-	.rodata     start:0x00725800 end:0x0072580F
+	.text       start:0x00251FE8 end:0x0025237C
+	.text       start:0x002523A8 end:0x002527F0
+	.text       start:0x0025281C end:0x00252A04
+	.text       start:0x00252A30 end:0x00252C20
+	.text       start:0x00252C4C end:0x00252D54
+	.text       start:0x00252D70 end:0x0025309C
+	.text       start:0x002530B8 end:0x00253158
+	.text       start:0x002531B4 end:0x00253250
+	.text       start:0x002532A8 end:0x00253C90
+	.text       start:0x00253CBC end:0x00253DDC
+	.text       start:0x00253E40 end:0x00253EDC
+	.text       start:0x00253F2C end:0x00253FB8
+	.text       start:0x0025400C end:0x002543A8
+	.text       start:0x00254468 end:0x00254DB0
+	.text       start:0x00254E08 end:0x00254E94
+	.text       start:0x00254EEC end:0x00255890
+	.text       start:0x002558AC end:0x00255BC8
+	.text       start:0x00255BF8 end:0x00255FC4
+	.text       start:0x002560D8 end:0x00256288
+	.text       start:0x002562A4 end:0x0025647C
+	.text       start:0x002565AC end:0x00256F78
+	.text       start:0x00256FA8 end:0x00257038
+	.text       start:0x00257120 end:0x00257454
+	.text       start:0x00257470 end:0x00257938
+	.text       start:0x00257A4C end:0x00257AE8
+	.text       start:0x00257B40 end:0x0025829C
+	.text       start:0x002582C8 end:0x00258734
+	.text       start:0x002587C4 end:0x002593AC
+	.text       start:0x002593D8 end:0x002595A0
+	.text       start:0x002595F8 end:0x00259CA0
+	.text       start:0x00259CCC end:0x00259E4C
+	.text       start:0x00259E68 end:0x0025A614
+	.text       start:0x0025A6B0 end:0x0025AC40
+	.text       start:0x0025AC98 end:0x0025B004
+	.text       start:0x0025B084 end:0x0025B1A4
+	.text       start:0x0025B240 end:0x0025BA54
+	.text       start:0x0025BA80 end:0x0025BB10
+	.text       start:0x0025BC40 end:0x0025BD28
+	.text       start:0x0025BD54 end:0x0025C2B0
+	.text       start:0x0025C314 end:0x0025C51C
+	.text       start:0x0025C548 end:0x0025C5D8
+	.text       start:0x0025C5E0 end:0x0025C66C
+	.text       start:0x0025C688 end:0x0025C958
+	.text       start:0x0025C990 end:0x0025CCAC
+	.text       start:0x0025CCD8 end:0x0025D068
+	.text       start:0x0025D0A0 end:0x0025D13C
+	.rodata     start:0x00724B18 end:0x00725871
 
 squirrel/sqapi.cpp:
 	.text       start:0x00141E40 end:0x00141F2C

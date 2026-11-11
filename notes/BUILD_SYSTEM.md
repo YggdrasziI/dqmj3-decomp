@@ -227,9 +227,14 @@ never labelled.
 - `tools/project.py`: on Windows the compiler is started with a native path (`CreateProcess` does not
   search a relative path written with `/`).
 - `tools/ctr/linker.py`: a data section whose only symbols are locals that `symbols.txt` does not know is
-  placed in the unit's free space, like a section without symbols. armcc puts each function's `__FUNCTION__`
-  string in a `.constdata` section with a local symbol named `__FUNCTION__`; such a string needs its `.rodata`
-  range claimed in `splits.txt` and no symbol at its address in `symbols.txt`.
+  placed in the unit's free space, like a section without symbols. armcc puts the `__FUNCTION__` strings of
+  a file in one `.constdata` section, in source order, each with a local symbol named `__FUNCTION__`
+  (`FieldScriptFunc.cpp`: 186 strings in 0x00724B18-0x00725871, 2026-11-11). The unit claims the whole
+  block, and `symbols.txt` lists each string as `__FUNCTION__` with `scope:local`, so that the split object
+  has the same local symbols: without them the original side refers to `.constdata+offset` and objdiff
+  counts every error path as a difference. The linker skips names that are ambiguous when it anchors a
+  section (`_place`), so the block is still placed as anonymous data; linking that block in a `Matching`
+  unit is not tested yet.
 - `tools/project.py`: the report is generated with `-c functionRelocDiffs=name_address`. By default
   `objdiff-cli report generate` ignores relocation targets (`none`), unlike `objdiff-cli diff` and the
   objdiff GUI: a function that calls `fn_0016CCF0` where ours calls `SQVM::GetAt` counted as a match. With

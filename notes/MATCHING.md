@@ -53,3 +53,27 @@ but was not. `--cpu=MPCoreNoVFP` and RVCT 4.1 b1049 matched them all unchanged.
   builds (`compiler_sweep.py` on the file) before rewriting the source.
 - Run the sweep per library: set its `armcc_version` and `--cpu` in its `config.libs`
   entry in `configure.py`.
+
+## Script bindings (FieldScriptFunc.cpp, 2026-11-11)
+
+The 186 bindings follow one shape: one getter per argument (`sq_get*` at -n ... -1, each
+error path on its own line, set with `#line`), one call on the field object, then
+`return 0` or a `sq_push*` of the result and `return 1`. They were written by a script
+from the disassembly, then the exceptions by hand.
+
+- Load the object into a local first: `void* self = lbl_007E7808; fn_X(self, value);`.
+  Passing `lbl_007E7808` directly schedules the loads differently, and a `bool` parameter
+  then compiles to `movne r1, #1` + `moveq r1, #0` in a new register instead of the
+  original `ldr r1, [sp]; cmp r1, #0; ...; movne r1, #1`.
+- Read the argument types from the code around the call: `and rN, rN, #0xff` is an
+  `unsigned char` parameter, `sxtb` a `signed char`, `sxth` a `short`, `movne`/`moveq`
+  a `bool`, a plain load an `int` (or `SQBool` when the getter is `sq_getbool`), and
+  `fsitos` an `int` passed to a `float` parameter. Arguments past r3 are stored to
+  `[sp, #0]`...: look for the conversion of the register stored there, and take only the
+  last write of a register before the call.
+- A function returning a vector of three floats returns it in `s0`-`s2` (VFP ABI,
+  `fstmias r2, {s0, s1, s2}` after the call); one returning `ldmia r0` returns a pointer.
+- Two adjacent float locals copied into a struct with `ldrd`/`strd`: armcc does it for an
+  inline member that assigns the fields (`offset.Set(0.0f, a1, a2)`), not for an aggregate
+  initializer or a constructor (word or VFP copies). armcc does not follow the declaration
+  order of locals when it lays out the stack: moving declarations did not change it.

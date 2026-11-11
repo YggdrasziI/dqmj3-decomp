@@ -8,13 +8,25 @@
 typedef int SQInteger;
 typedef int SQRESULT;
 typedef float SQFloat;
+typedef unsigned int SQBool;
+typedef char SQChar;
 typedef struct SQVM* HSQUIRRELVM;
 
 #define SQ_FAILED(res) ((res) < 0)
 
 extern "C" {
+SQRESULT sq_getstring(HSQUIRRELVM v, SQInteger idx, const SQChar** c);
+SQRESULT sq_getinteger(HSQUIRRELVM v, SQInteger idx, SQInteger* i);
 SQRESULT sq_getfloat(HSQUIRRELVM v, SQInteger idx, SQFloat* f);
+SQRESULT sq_getbool(HSQUIRRELVM v, SQInteger idx, SQBool* b);
 SQRESULT sq_throwerror(HSQUIRRELVM v, const char* err);
+SQRESULT sq_get(HSQUIRRELVM v, SQInteger idx);
+SQRESULT sq_suspendvm(HSQUIRRELVM v);
+void sq_pop(HSQUIRRELVM v, SQInteger nelemstopop);
+void sq_pushstring(HSQUIRRELVM v, const SQChar* s, SQInteger len);
+void sq_pushfloat(HSQUIRRELVM v, SQFloat f);
+void sq_pushinteger(HSQUIRRELVM v, SQInteger n);
+void sq_pushbool(HSQUIRRELVM v, SQBool b);
 }
 
 #endif

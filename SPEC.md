@@ -51,7 +51,7 @@ Each is a lead for the region map, not yet an attribution:
   `dqmj3ds.sil2.square-enix.com`, `SIL_ERR_*` and `X-Sil-Version`.
 - Game code: the Squirrel bindings pass their file name to the error path:
   `BattleScriptFunc.cpp` (140 functions in 0x0012D8E0-0x00148AE0) and
-  `FieldScriptFunc.cpp` (186 functions in 0x00251FE8-0x0025D0A0).
+  `FieldScriptFunc.cpp` (186 functions in 0x00251FE8-0x0025D13C).
 
 ## Other versions
 
