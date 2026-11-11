@@ -111,7 +111,8 @@ config.objdiff_tag = "v3.8.2"
 
 # RVCT 4.1 build 921. Squirrel 2.2.5, compiled with the game, has 224 functions that
 # match with build 921; every other build of decomp.me's armcc.zip matches fewer
-# (1049, 1440, 1454: 221; 894: 218). The CTR-SDK's zlib needs 921 or later.
+# (1049, 1440, 1454: 221; 894: 218). The CTR-SDK's zlib is a prebuilt library with its
+# own build and flags (the zlib entry below).
 # See notes/COMPILER.md.
 config.armcc_version = "4.1/b921"
 config.scratch_compilers = {
@@ -173,16 +174,20 @@ config.libs = [
     },
     {
         # zlib 1.2.7 (zlib license, libs/zlib/README) for the CTR-SDK copy of the image
-        # ("1.2.7.f-NINTENDO-CTR-SDK-v1"), built without Z_SOLO: its default allocator is
-        # there (zconf.h altered, armcc has no <sys/types.h>). A unit claims only the functions
-        # of that copy found byte for byte; the image also has a zlib 1.2.5 copy
+        # ("1.2.7.f-NINTENDO-CTR-SDK-v1"), a library Nintendo built with its own compiler and
+        # CPU: deflate matches with builds 1049, 1440 and 1454 only, inflate_table not with
+        # 894 or 921 (1049 taken, the three are not told apart), and the copy matches only
+        # with --cpu=MPCoreNoVFP. Built without Z_SOLO: its default allocator is there
+        # (zconf.h altered, armcc has no <sys/types.h>). A unit claims only the functions of
+        # that copy found byte for byte; the image also has a zlib 1.2.5 copy
         # (notes/COMPILER.md, notes/SPLITS.md).
         "lib": "zlib",
         "src_dir": "libs",
+        "armcc_version": "4.1/b1049",
         "cflags": [
             "--c90",
             "--arm",
-            "--cpu=MPCore",
+            "--cpu=MPCoreNoVFP",
             "--apcs=/interwork",
             "--split_sections",
             "-O3",
@@ -192,7 +197,7 @@ config.libs = [
         "progress_category": "lib",
         "objects": [
             Object(NonMatching, f"zlib/{name}.c")
-            for name in ("deflate", "inflate", "trees")
+            for name in ("adler32", "crc32", "deflate", "inffast", "inflate", "inftrees", "trees")
         ],
     },
 ]

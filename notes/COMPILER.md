@@ -8,7 +8,7 @@ Anything without evidence is marked as a hypothesis.
 | Item | Value | Status |
 |---|---|---|
 | Compiler (game code) | RVCT 4.1 build 921 (`armcc`) | proven among the 14 builds of decomp.me's `armcc.zip` (Squirrel sweep) |
-| Compiler (CTR-SDK zlib) | RVCT 4.1, build 921 or later | proven (zlib sweep); exact build open |
+| Compiler (CTR-SDK zlib) | RVCT 4.1 build 1049, 1440 or 1454, `--cpu=MPCoreNoVFP`, `-O3 -Otime`, C90 | proven (zlib sweep); the three builds are not told apart |
 | Optimisation | `-O3 -Otime` | proven (Squirrel, zlib) |
 | `--fpmode=fast`, `--signed_chars` | yes | proven (Squirrel) |
 | `--cpu=MPCore --arm --apcs=/interwork --split_sections --no_rtti_data` | used | consistent with every match; not tested one by one |
@@ -86,14 +86,34 @@ two components with no link between them:
   The functions that pass that string (0x003E1538, 0x003E1604, 0x0047AEF8, 0x0047C14C,
   0x0056BFD4, 0x0056C0D0) call this copy. Its exported functions start with a `mov r0,
   r0` word that callers branch to (0x0069D0C8, 0x0069D1C8, 0x0069D6BC, 0x0069F088,
-  0x0069F0D8, 0x0069F240). Its `inflateInit2_` (0x0069F0DC) and deflate init
+  0x0069F0D8, 0x0069F240). Its `inflateInit2_` (0x0069F0DC) and `deflateInit2_`
   (0x0069D2AC) point to an 8-byte default allocator, `mul r0, r1, r2; b fn_002FE59C`
   (0x006A0010): `zcalloc` of 1.2.7 built **without** `Z_SOLO` (with `Z_SOLO` there is no
-  default allocator). Source: zlib 1.2.7, no `Z_SOLO`, `zconf.h` without
-  `<sys/types.h>` (armcc 4.1 has none), `--c90` and the C flags of `configure.py`.
-  Found with build 921: `_tr_align`, `_tr_flush_bits`, `_tr_init`, `_tr_stored_block`,
-  `inflateInit_`, `inflateReset`, `deflateBound`; `inflateInit2_` is named from the tail
-  call of `inflateInit_` but differs from the public source (0x164 bytes, 0x144 in 1.2.7).
+  default allocator).
+
+  It was built with its own compiler and CPU (a prebuilt SDK library):
+  - `--cpu`: with `MPCore` (the game's) only the functions that do not depend on it
+    match. `6`, `6K`, `6Z` and `ARM1136J-S` match 15 functions, with the copy's register
+    choices but without the `nop` (0xE320F000) the copy has, for example between `subs`
+    and `beq` in `updatewindow`. `MPCoreNoVFP` (same as `MPCore.no_vfp`) matches
+    everything: MPCore scheduling and its `nop`s, and the other register choices.
+    `ARM1136J-S-rev1`, `ARM1136JF-S-rev1`, `ARM1176JZF-S` and `6T2` match less. A `mov r0,
+    r0` (0xE1A00000) is not one of these `nop`s: it is a call armlink inlined
+    (`notes/BUILD_SYSTEM.md`). The game's code has 0xE320F000 too (28,538 words in 6,326
+    functions), from `MPCore`.
+  - Build, with `--cpu=MPCoreNoVFP`: `deflate` matches with 4.1 b1049, b1440 and b1454
+    only; `inflate_table` with b791, b844, b1049, b1440, b1454 but not b894 or b921.
+    1049, 1440 and 1454 find the same 20 functions.
+
+  Source: zlib 1.2.7, no `Z_SOLO`, `zconf.h` without `<sys/types.h>` (armcc 4.1 has
+  none), `--c90`. With b1049 and `--cpu=MPCoreNoVFP`, 28 functions of the copy are at
+  100 % (`notes/SPLITS.md`). Not matched: `inflateInit2_` and `deflateInit2_`, which
+  each start with an added call `f(0, 0x0400028B)` to an empty function that armlink
+  inlined (`mov r0, #0; ldr r1, =0x0400028B; mov r0, r0`); its name is unknown. The same
+  call, with another constant (0x04000027-0x0400029A, each used once), starts 20 other
+  functions of SDK and network code (0x00104C48, 0x00113450 near the `fs:USER` client,
+  0x0017FA48, the `ir:USER` client...): likely a library-use marker of the CTR-SDK
+  (hypothesis). Every site is ARM and inlined, so no call shows the function.
 - **zlib 1.2.5**: called from the network block (0x0040F940, which refers to the string
   `1.2.5` at 0x0073C75C, calls `deflateInit2_` 0x006A3248). zlib 1.2.5 (public release)
   with the same flags (an empty `sys/types.h` on the include path) finds 20 functions with
@@ -107,7 +127,7 @@ two components with no link between them:
   default allocator is 0x006A5F60. Not named: two copies can not share a name in
   `symbols.txt`, and the names of this copy (a prefix?) are not known.
 
-With 1.2.7: `-O3 -Ospace` and `-O2 -Ospace` find none, `-O2 -Otime` one; `build_tree`
+With 1.2.7 and `--cpu=MPCore`: `-O3 -Ospace` and `-O2 -Ospace` find none, `-O2 -Otime` one; `build_tree`
 (1.2.5 copy) matches with builds 921, 1049, 1440, 1454 only, `inflate_fast` (1.2.5 copy)
 with 894 and later; 4.0 and 4.1 b561 find none of them.
 
@@ -142,7 +162,9 @@ No compiler identification string (`ARM C/C++ Compiler`, `RVCT`) is in `code.bin
 ## Open questions
 
 - Whether every library (NintendoWare, NEX, PIA, SIL) was built with build 921 too.
-  Prebuilt libraries may need their own `armcc_version` per object.
+  The CTR-SDK's zlib was not (b1049/1440/1454, `--cpu=MPCoreNoVFP`, above): prebuilt
+  libraries need their own `armcc_version` and `--cpu`, so a sweep of a library should
+  try every build with `--cpu=MPCore` and `--cpu=MPCoreNoVFP`.
 - Thumb code (332 functions): which flags.
 - The static initializer of `sqstate.cpp` (above): matches with 5.04 only.
 
@@ -152,6 +174,7 @@ No compiler identification string (`ARM C/C++ Compiler`, `RVCT`) is in `code.bin
 python tools/compiler_sweep.py --project <BigRed clone>
 python tools/compiler_sweep.py --flags "<flags> --no_dep_name" -I <sq>/include -I <sq>/squirrel <sq>/squirrel/*.cpp
 python tools/compiler_sweep.py --flags "--c90 --arm --cpu=MPCore --apcs=/interwork --split_sections -O3 -Otime" -I <dir with an empty sys/types.h> -I <zlib> <zlib>/{adler32,crc32,deflate,inflate,inffast,inftrees,trees,zutil,compress,uncompr}.c
+python tools/compiler_sweep.py --flags "--c90 --arm --cpu=MPCoreNoVFP --apcs=/interwork --split_sections -O3 -Otime" -I libs/zlib libs/zlib/{adler32,crc32,deflate,inflate,inffast,inftrees,trees,compress,uncompr}.c
 ```
 
 Under Git Bash, set `MSYS_NO_PATHCONV=1` so that `/interwork` is not turned into a path.

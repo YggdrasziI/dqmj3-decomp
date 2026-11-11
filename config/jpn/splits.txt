@@ -204,12 +204,39 @@ squirrel/sqvm.cpp:
 	.rodata     start:0x0074B14C end:0x0074B2B7
 	.rodata     start:0x007A7B2C end:0x007A7B48
 
+zlib/adler32.c:
+	.text       start:0x0069B6E4 end:0x0069BA94
+
+zlib/crc32.c:
+	.text       start:0x006962E8 end:0x006968A0
+	.text       start:0x0069BA94 end:0x0069BF6C
+
 zlib/deflate.c:
+	.text       start:0x00696E78 end:0x006974D4
+	.text       start:0x00697AD4 end:0x00698264
+	.text       start:0x006989B4 end:0x00698B94
+	.text       start:0x00698D4C end:0x0069912C
+	.text       start:0x0069946C end:0x006994F0
+	.text       start:0x0069BF70 end:0x0069D0C8
 	.text       start:0x0069D0CC end:0x0069D1C8
+	.text       start:0x0069D1CC end:0x0069D2AC
+	.text       start:0x0069D568 end:0x0069D6BC
+
+zlib/inffast.c:
+	.text       start:0x0069F304 end:0x0069FA70
 
 zlib/inflate.c:
+	.text       start:0x0069D6C0 end:0x0069F088
+	.text       start:0x0069F08C end:0x0069F0D8
 	.text       start:0x0069F244 end:0x0069F304
+	.text       start:0x006B0B80 end:0x006B0CA8
+
+zlib/inftrees.c:
+	.text       start:0x0069FA70 end:0x006A0010
 
 zlib/trees.c:
-	.text       start:0x0069AAAC end:0x0069ACD0
-	.text       start:0x0069B3DC end:0x0069B6E4
+	.text       start:0x00694968 end:0x006951B4
+	.text       start:0x00695A2C end:0x00695E8C
+	.text       start:0x0069AAAC end:0x0069B6E4
+	.text       start:0x006A5F78 end:0x006A6088
+	.text       start:0x006A6198 end:0x006A6718

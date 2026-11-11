@@ -37,3 +37,19 @@ refer to, from the same relocation in our object (same offset, type and addend).
 BigRed's notes on what armlink did to the
 code (`notes/BUILD_SYSTEM.md`, "What the linker did to the code") come first when a
 call or a branch differs.
+
+## Library code that is close but not exact: try other CPUs and builds first
+
+A prebuilt library may have been compiled with another `--cpu` and build than the game.
+Seen in the CTR-SDK's zlib (2026-11-11, `notes/COMPILER.md`): with the game's flags, many
+functions differed by swapped registers or a few `nop`s, which looks like a source change
+but was not. `--cpu=MPCoreNoVFP` and RVCT 4.1 b1049 matched them all unchanged.
+
+- Swapped registers over a whole function, the same instructions otherwise: try other
+  `--cpu` values (`6K`, `ARM1136J-S`, `MPCoreNoVFP`) before editing the source.
+- `nop` (0xE320F000) is MPCore scheduling. `mov r0, r0` (0xE1A00000) is a call armlink
+  inlined (`notes/BUILD_SYSTEM.md`). They are not the same and need different fixes.
+- One instruction more or less than the original, with the right CPU: try the other
+  builds (`compiler_sweep.py` on the file) before rewriting the source.
+- Run the sweep per library: set its `armcc_version` and `--cpu` in its `config.libs`
+  entry in `configure.py`.

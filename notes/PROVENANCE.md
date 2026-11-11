@@ -20,6 +20,7 @@ Google Inc., **Apache-2.0**, notice kept, license in `LICENSES/Apache-2.0.txt`).
 | `tools/ctr/arm.py` | a function is walked again when a word was decoded as code before being found as literal pool data |
 | `tools/ctr/image.py` | `inlined_functions` in `config.toml` |
 | `tools/ctr/split.py`, `tools/ctr/image.py` | `[init_array]` in `config.toml`: the static initializer table is split into `.init_array` sections with `R_ARM_TARGET1` relocations; `split.py`: a pointer is a string reference only when `StringPool.locate` gives back its address |
+| `tools/ctr/split.py` | the attribute `keep_pool` of `symbols.txt` keeps a trailing LDR-only pool in a function's size |
 | `tools/ctr/link.py` | `parse_intermixed_args` (Python 3.12 left the units after the options unparsed) |
 | `tools/ctr/prelink.py` | drops `R_ARM_NONE` relocations; renames template sections `t.<name>` to `i.<name>`; rewrites the addends of string pointers in data to the layout of split objects |
 | `tools/ctr/strpool.py` | padding (zero, 0xFF) between strings skipped; a pointer to a terminator is the empty string; `literal_containing` |
