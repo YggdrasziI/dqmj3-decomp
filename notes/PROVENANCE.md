@@ -13,7 +13,7 @@ Google Inc., **Apache-2.0**, notice kept, license in `LICENSES/Apache-2.0.txt`).
 | Our file | Changes |
 |---|---|
 | `configure.py` | version `jpn` (`CTR-P-BJ3J`); own objects and libraries (`game`, `squirrel`); progress categories game / sdk / nw / net / lib / unknown; progress image disabled; compiler and flags marked as placeholders |
-| `tools/ctr/analyze.py` | after ARM code, a Thumb guess needs a Thumb `push` prologue (`is_thumb_prologue`) |
+| `tools/ctr/analyze.py` | after ARM code, a Thumb guess needs a Thumb `push` prologue (`is_thumb_prologue`); inline UTF-16 strings addressed with `adr` are read up to a zero halfword (`string_words`) |
 | `tools/ctr/report_accounting.py` | BigRed's total code size check removed; data objects in `.text` counted for their size |
 | `tools/project.py` | report command chained through `cmd /s /c` on Windows; report generated with `functionRelocDiffs=name_address`; armcc started with a native path on Windows |
 | `tools/ctr/linker.py` | data sections with only unknown local symbols (`__FUNCTION__`) placed like sections without symbols; the literal lookup of `locate_string` moved to `StringPool.literal_containing`; calls to the functions in `inlined_functions` of `config.toml` replaced by their instruction, their compiled body checked (`inline_body` split out of `inline_call`); an instruction of `bx lr` is an empty function, inlined as `mov r0, r0` |

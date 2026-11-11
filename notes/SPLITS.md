@@ -7,9 +7,9 @@ for every boundary. A boundary is a hypothesis until a unit on each side matches
 
 - `config/jpn/splits.txt` claims one unit; every other byte belongs to an automatic
   unit (`auto/<section>_<address>`, 64 KiB grid, see `notes/BUILD_SYSTEM.md`).
-- `config/jpn/symbols.txt` comes from `tools/ctr/analyze.py` (2026-11-10): 34,058
-  functions (332 Thumb), 14,995 data labels. 127 functions have control flow the
-  analysis could not follow; their bounds are not trusted.
+- `config/jpn/symbols.txt` comes from `tools/ctr/analyze.py` (2026-11-10), fixed by hand
+  since: 34,020 functions (332 Thumb) after the bounds fixes of 2026-11-11 ("Function
+  bounds" below). 39 functions still have control flow the analysis could not follow.
 - No `[[regions]]` in `config/jpn/config.toml` yet; string pools below.
 
 ## Leads for the region map (step 4)
@@ -108,6 +108,29 @@ inside a name-sorted run (0x0017BDD0-0x00186F4C): either some SDK code is sorted
 the game, or that client is game code. Open.
 
 No `[[regions]]` from these: no bound is proven.
+
+## Function bounds (2026-11-11)
+
+`tools/ctr/analyze.py --dry-run` listed 134 functions with control flow it could not follow.
+In 89 of them, an `ldr` loads a literal after the start of the next function, and nothing
+else refers to that start (no call, no pointer, from the relocations of the split objects).
+Every one has inline UTF-16 strings between its code and its pool (`rom:/data/...`,
+`http://`, NEX messages), which the analysis read as one character, so the next function
+was started in the strings. Fixed in `symbols.txt`: each of the 89 now ends at the end of
+its pool, the 89 false starts are removed, and 51 functions that start right after a pool
+(inside the old false start) are added; all 140 walk cleanly with their new bounds. The
+analysis reads those strings now (`notes/BUILD_SYSTEM.md`). The 39 left:
+
+- 21 in the two C-library regions, Thumb mostly: their pool is after the next function,
+  which is called from elsewhere (0x0010119C's pool at 0x00101660 is after `fn_001013B0`).
+  Hypothesis: the C library is not built with one section per function, so a pool may
+  follow several functions. Bounds kept.
+- 18 others, not reviewed one by one: three where the start inside the pool is called
+  from elsewhere (0x0037E9B0, 0x005CE4D0, 0x005D0A90), loads before the function start
+  (0x001BF5AC, 0x003B303C, 0x003FB0D8, 0x003FB13C, 0x005CEE4C), switch tables that do
+  not decode (0x0019B060, 0x002BE59C, 0x0032C960), data islands (0x0065F998, 0x0066F684,
+  0x0066FD6C), and 0x00136794, 0x00372108, 0x0037E5D8, 0x00552E08, 0x005CD1E8, 0x00650560,
+  flagged while walking another function.
 
 ## String pools (2026-11-10)
 

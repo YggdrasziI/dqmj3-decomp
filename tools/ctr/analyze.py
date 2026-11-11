@@ -182,14 +182,34 @@ class Discovery:
         return not is_arm_terminator(self.image.u32(prev))
 
     def string_words(self, info: arm.FunctionInfo) -> Set[int]:
-        """Words occupied by NUL-terminated strings the function addresses with `adr`."""
+        """
+        Words occupied by NUL-terminated strings the function addresses with `adr`.
+
+        armcc places wide (UTF-16) string literals inline too, after the code and
+        before the literal pool. A string whose second byte is zero and first is not is
+        read as UTF-16, up to a zero halfword; a one-character narrow string reads the
+        same, since armcc pads it with zeros. A wide string that starts with a non-ASCII
+        character is still read as narrow, up to its first zero byte: read as halfwords,
+        narrow ASCII strings look like CJK text (1,100 of the image's would), so the bytes
+        alone do not tell the two apart.
+        """
         words: Set[int] = set()
         for target in info.adr_targets:
             if target in info.code:
                 continue
             cur = target
-            while cur < info.limit and self.image.u8(cur) != 0:
-                cur += 1
+            if (
+                not target & 1
+                and target + 1 < info.limit
+                and self.image.u8(target) != 0
+                and self.image.u8(target + 1) == 0
+            ):
+                while cur + 1 < info.limit and self.image.u16(cur) != 0:
+                    cur += 2
+                cur += 1  # the last byte of the terminator
+            else:
+                while cur < info.limit and self.image.u8(cur) != 0:
+                    cur += 1
             words.update(range(target & ~3, min(info.limit, cur + 1), 4))
         return words
 

@@ -211,6 +211,11 @@ never labelled.
   `push`. Without that rule the data islands of `.text` (pointer tables, UTF-16 strings, around
   0x00640000-0x006C0000) were tiled as Thumb code: 65,632 functions, 26,127 of them Thumb. With it: 34,058
   functions, 332 Thumb.
+- `tools/ctr/analyze.py`: armcc places wide (UTF-16) string literals inline, after the code and before the
+  literal pool, and addresses them with `adr`. The strings were read up to their first zero byte (one
+  character), so the function ended before them and its pool, and the next function was started there: 89
+  functions had their pool after such a false start. A string whose first byte is not zero and second is is
+  now read as UTF-16 up to a zero halfword. Suspicious functions in a dry run: 134 -> 39 (2026-11-11).
 - `tools/ctr/arm.py`: code after a call that does not return (`bl longjmp`) runs into the literal pool, and a
   walk could decode the pool (and an inline string after it) as code before reaching the `ldr` that loads
   it. When a word ends up both code and pool data, the function is walked again with those words known to
@@ -253,7 +258,8 @@ never labelled.
 
 ## Known gaps
 
-- **Function boundaries are a starting point.** 32 functions have control flow the analysis could not follow,
+- **Function boundaries are a starting point.** 39 functions have control flow the analysis could not follow
+  (`notes/SPLITS.md`, "Function bounds"),
   and the boundaries inside the C library at the start of `.text` are unreliable. A function that is only
   reached by a tail call that the linker did not reorder is still part of the function in front of it. Fix
   `symbols.txt` when you run into one.
