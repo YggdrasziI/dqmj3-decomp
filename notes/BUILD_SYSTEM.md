@@ -258,7 +258,7 @@ never labelled.
 
 ## Known gaps
 
-- **Function boundaries are a starting point.** 39 functions have control flow the analysis could not follow
+- **Function boundaries are a starting point.** 20 functions, all in the C library, have control flow the analysis could not follow
   (`notes/SPLITS.md`, "Function bounds"),
   and the boundaries inside the C library at the start of `.text` are unreliable. A function that is only
   reached by a tail call that the linker did not reorder is still part of the function in front of it. Fix
