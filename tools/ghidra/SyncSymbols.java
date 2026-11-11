@@ -4,13 +4,18 @@
 // A real name of symbols.txt (not fn_<addr> / lbl_<addr>) replaces the name in
 // Ghidra. An analysis name only replaces a default Ghidra name (FUN_..., DAT_...),
 // so names typed in Ghidra are kept; they are listed, as they are not evidence.
+// A function named fn_<its own address> that symbols.txt no longer has (a bound fixed
+// there) is removed first, so that the functions that replace it can be created.
 //@category DQMJ3
 
 import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -33,7 +38,7 @@ public class SyncSymbols extends GhidraScript {
     private static final Pattern ANALYSIS = Pattern.compile("^(fn|lbl)_[0-9A-F]{8}$");
 
     private boolean dry;
-    private int named, kept, created, thumb, thumbConflicts, labels;
+    private int named, kept, created, removed, thumb, thumbConflicts, labels;
 
     @Override
     public void run() throws Exception {
@@ -49,6 +54,30 @@ public class SyncSymbols extends GhidraScript {
         ProgramContext context = currentProgram.getProgramContext();
         FunctionManager functions = currentProgram.getFunctionManager();
         SymbolTable table = currentProgram.getSymbolTable();
+
+        // Functions this script created that symbols.txt no longer lists
+        Set<Address> listed = new HashSet<>();
+        for (String line : lines) {
+            Matcher m = LINE.matcher(line);
+            if (m.matches() && m.group(4).contains("type:function")) {
+                listed.add(toAddr(Long.parseLong(m.group(3), 16)));
+            }
+        }
+        List<Function> stale = new ArrayList<>();
+        for (Function f : functions.getFunctions(true)) {
+            Address entry = f.getEntryPoint();
+            String own = String.format("fn_%08X", entry.getOffset());
+            if (!listed.contains(entry) && f.getName().equals(own)) {
+                stale.add(f);
+            }
+        }
+        for (Function f : stale) {
+            removed++;
+            println("removed " + f.getName() + " (not in symbols.txt)");
+            if (!dry) {
+                removeFunction(f);
+            }
+        }
 
         // Thumb mode first, so that disassembly follows it
         for (String line : lines) {
@@ -113,9 +142,9 @@ public class SyncSymbols extends GhidraScript {
                 }
             }
         }
-        println(String.format("%s%d Thumb ranges set (%d conflicts), %d functions created, %d labels created, "
-            + "%d names set, %d names typed in Ghidra kept", dry ? "(dry run) " : "", thumb, thumbConflicts,
-            created, labels, named, kept));
+        println(String.format("%s%d Thumb ranges set (%d conflicts), %d functions removed, %d functions created, "
+            + "%d labels created, %d names set, %d names typed in Ghidra kept", dry ? "(dry run) " : "", thumb,
+            thumbConflicts, removed, created, labels, named, kept));
     }
 
     private void apply(Symbol s, String name) throws Exception {
