@@ -10,7 +10,8 @@ for every boundary. A boundary is a hypothesis until a unit on each side matches
 - `config/jpn/symbols.txt` comes from `tools/ctr/analyze.py` (2026-11-10), fixed by hand
   since: 34,020 functions (332 Thumb) after the bounds fixes of 2026-11-11 ("Function
   bounds" below). 39 functions still have control flow the analysis could not follow.
-- No `[[regions]]` in `config/jpn/config.toml` yet; string pools below.
+- `[[regions]]` in `config/jpn/config.toml`: three blocks ("Region map" below); string
+  pools below.
 
 ## Leads for the region map (step 4)
 
@@ -107,9 +108,41 @@ No sharp edge here, unlike the network block. The `ir:USER` client (0x0017FA48) 
 inside a name-sorted run (0x0017BDD0-0x00186F4C): either some SDK code is sorted with
 the game, or that client is game code. Open.
 
-No `[[regions]]` from these: no bound is proven.
+No `[[regions]]` from these: no bound is proven (the region map below keeps the C library
+before 0x00104AF8 only).
 
-## Function bounds (2026-11-11)
+## Region map (2026-11-11)
+
+### Sorted runs and link-order blocks
+
+Most of `.text` is in runs sorted by name ("Code order" below), where game functions and
+library functions compiled with the game alternate one function at a time: Squirrel
+(0x00154000-0x006AE000), the game's script bindings, sead-like functions found by
+compiling BigRed's sources (`sead::Heap`, `sead::ExpHeap`, `sead::ThreadMgr` at
+0x005BDDE0-0x005C0908 in mangled-name order, `sead::ExpHeap` const methods at 0x0064B6F8;
+names from another game, leads only), both zlib copies (0x00694968-0x006B0DD0, by name:
+`build_tree` ... `flush_pending`, then `_tr_align` ... `zcfree`, then `scan_tree`,
+`send_tree`, `updatewindow`), and the 2,102 ARM static initializers (0x00650000-0x00694620,
+right before `build_tree`). An address range there can not be given to one library, so it
+is attributed unit by unit.
+
+Three blocks keep their own order and are in `[[regions]]`:
+
+| Region | Range | Category | Evidence | Edges |
+|---|---|---|---|---|
+| C library and start-up | 0x00100000-0x00104AF8 | `sdk` | `__ctr_start` (entry), RVCT C library functions (`__aeabi_vec_dtor`, `memcmp`, `strtol`, `__2sprintf`, `toupper`, `strtoul`, `__c89vsprintf`, `strstr`, `__cxa_pure_virtual`) out of name order; 202 of the 332 Thumb functions (the game is ARM) | start: the entry point. End: the last Thumb function. After it, `fn_00104AF8` (ARM) is called only from the C library and calls it, and 0x00104BC4-0x00104C9C are start-up functions called from the C library, one with the CTR-SDK marker call (0x00104C54): SDK start-up code that goes on with no sharp edge ("Start of `.text`" above). Not in a region. |
+| C library | 0x002FE18C-0x003041E0 | `sdk` | `__rt_ctype_table`, `strlen`, `malloc`, `__aeabi_idivmod`, `__aeabi_memcpy`, `__aeabi_memclr4`, `free`, `tolower`, `__aeabi_atexit`, out of name order; the other 130 Thumb functions | start: `__rt_ctype_table`; `fn_002FE0BC` before it and `fn_002FE1A0` after it are in a vtable (`lbl_00782070`) and call game code, so the edge is within one or two functions. End: the last Thumb function; `fn_00304280`, after it, is in a vtable and calls game code. |
+| Network libraries | 0x003E0AE4-0x004C6250 | `net` | call-graph block ("Network libraries (NEX, PIA): leads" above): CTR-SDK clients of `ac:u`, `cecd:u`, `ssl:C`, `boss:U`, `http:C`, `soc:U`, `frd:u`; NEX (`NEX_3_9_1`) and PIA strings; NEX UTF-16 messages (`prudp:/`, `Transport Buffer Thread`, `ConnectionManager`) in 0x003EA430-0x004571D4 | first and last function linked to the block, within a few functions. The SDK clients and NEX/PIA are not separated (no sharp edge between them). |
+
+NEX and PIA strings outside the block, in name-sorted code: `PiaInet Automatch`
+(0x005CDF8C), `PiaInet Matchmake` (0x005D06BC), `Community`/`PersistentGathering`
+(0x0062BC3C), `Failed:PrepareGetObject`/`PreparePostObject` (0x006B9D00-0x006BBCC8):
+likely the game's use of these libraries (wide strings passed to NEX), not the libraries.
+
+All 332 Thumb functions are in the two C-library regions. Attribution by address is only
+possible for these three blocks; the sorted runs are attributed per unit.
+
+### Function bounds (2026-11-11)
 
 `tools/ctr/analyze.py --dry-run` listed 134 functions with control flow it could not follow.
 In 89 of them, an `ldr` loads a literal after the start of the next function, and nothing

@@ -89,4 +89,34 @@ instruction = 0xE12FFF1E
 address = 0x007CC1F8
 size = 0x20E4
 
-# Library regions are not located yet (notes/SPLITS.md).
+# Library regions: the blocks of .text that keep their own link order (not sorted by
+# name with the game). Each id is a progress category of configure.py. Evidence and the
+# uncertainty of each edge in notes/SPLITS.md ("Region map"). The rest of .text is
+# name-sorted runs where game and library functions alternate: it is attributed unit by
+# unit, not by address.
+
+# RVCT C library and start-up code: __ctr_start, memcmp, strtol, strtoul, strstr,
+# __2sprintf...; 202 of the 332 Thumb functions; ends with the last Thumb function.
+[[regions]]
+id = "sdk"
+name = "C library and start-up"
+start = 0x00100000
+end = 0x00104AF8
+
+# RVCT C library, second part: __rt_ctype_table, strlen, malloc, __aeabi_idivmod,
+# __aeabi_memcpy, __aeabi_memclr4, free, tolower, __aeabi_atexit; the other 130 Thumb
+# functions; ends with the last Thumb function.
+[[regions]]
+id = "sdk"
+name = "C library"
+start = 0x002FE18C
+end = 0x003041E0
+
+# Network libraries: a call-graph block (first and last function linked to it) with the
+# CTR-SDK clients of ac:u, cecd:u, ssl:C, boss:U, http:C, soc:U and frd:u, NEX (NEX_3_9_1)
+# and PIA.
+[[regions]]
+id = "net"
+name = "Network libraries"
+start = 0x003E0AE4
+end = 0x004C6250
