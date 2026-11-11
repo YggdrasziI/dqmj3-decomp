@@ -185,6 +185,18 @@ functions counted at 100 % in the objdiff report.
 `FieldScriptFunc.cpp` (186 functions): 181 with b921, 183 with 5.04 b82; `GetPos_` and
 `SetAnalyzeInfo_` match with 5.04 only, none with b921 only.
 
+`BattleScriptFunc.cpp` (140 functions):
+
+| Build | Functions at 100 % |
+|---|---|
+| 4.0 b902 | 53 |
+| 4.1 b921, b1049 | 105 |
+| **5.04 b82** | **114** |
+
+Every function that matches with b921 also matches with 5.04. Nine match with 5.04 only:
+`SetHpMax_`, `SetMpMax_`, `SetHpDamage_`, `SetMpDamage_`, `SetHpMaxDamage_`,
+`SetMpMaxDamage_`, `MonsterRevival_`, `SetEventFlg_`, `SetMonsterMeshVisible_`.
+
 So `configure.py` sets `armcc_version="5.04/b82"` on the `game` library. Squirrel, built
 with the game, matches with b921 (above) and finds 71 functions with 5.04: the image
 holds code from at least two compilers. Which game files used which is open.

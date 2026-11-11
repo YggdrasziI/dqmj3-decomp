@@ -4,6 +4,45 @@ Sections:
 	.data       type:data align:4
 	.bss        type:bss align:4
 
+game/BattleScriptFunc.cpp:
+	.text       start:0x0012D8E0 end:0x0012E07C
+	.text       start:0x0012E0A8 end:0x0012E65C
+	.text       start:0x0012E724 end:0x0012EFC4
+	.text       start:0x0012EFF0 end:0x0012F828
+	.text       start:0x0012F860 end:0x0012F994
+	.text       start:0x0012F9C4 end:0x0012FB54
+	.text       start:0x0012FB80 end:0x001301E0
+	.text       start:0x00130210 end:0x00130350
+	.text       start:0x001303A8 end:0x001306F4
+	.text       start:0x00130720 end:0x00130DAC
+	.text       start:0x00130E30 end:0x001310B4
+	.text       start:0x001310EC end:0x00131410
+	.text       start:0x00131458 end:0x001317DC
+	.text       start:0x0013195C end:0x00131B90
+	.text       start:0x00131C30 end:0x00132160
+	.text       start:0x00132194 end:0x00132284
+	.text       start:0x001322B0 end:0x001323A4
+	.text       start:0x001323D0 end:0x00132828
+	.text       start:0x00132854 end:0x00132948
+	.text       start:0x00132974 end:0x00132A6C
+	.text       start:0x00132A98 end:0x00132CBC
+	.text       start:0x00132CE8 end:0x00132F04
+	.text       start:0x00132F30 end:0x00133260
+	.text       start:0x0013327C end:0x00133370
+	.text       start:0x0013338C end:0x00133668
+	.text       start:0x00133684 end:0x00133B10
+	.text       start:0x00133B3C end:0x00133F60
+	.text       start:0x00133FE4 end:0x0013437C
+	.text       start:0x0013438C end:0x00134584
+	.text       start:0x001345F8 end:0x00134E6C
+	.text       start:0x00134E98 end:0x001350E8
+	.text       start:0x00135114 end:0x001352F8
+	.text       start:0x00135334 end:0x00135874
+	.text       start:0x001358A0 end:0x00135BD4
+	.text       start:0x00135C00 end:0x00135F7C
+	.text       start:0x00135FB8 end:0x001361A0
+	.rodata     start:0x00720260 end:0x00720BBD
+
 game/FieldScriptFunc.cpp:
 	.text       start:0x00251FE8 end:0x0025237C
 	.text       start:0x002523A8 end:0x002527F0

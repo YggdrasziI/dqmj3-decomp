@@ -79,3 +79,32 @@ from the disassembly, then the exceptions by hand.
   two-float struct gives the `ldrd`/`strd` copy with the vector below the arguments
   (`SetTalkCameraEyeOffset_`, 93.9 %). armcc does not follow the declaration order of
   locals when it lays out the stack: moving declarations did not change it.
+
+### More from BattleScriptFunc.cpp (2026-11-11)
+
+Both binding files match better with ARM Compiler 5.04 b82 than with 4.1 b921
+(`notes/COMPILER.md`): try 5.04 on a game file before rewriting a function.
+
+- `sxtb` then `and #0xff` on one argument: a `signed char` local passed to an
+  `unsigned char` parameter: `signed char idx = a0; void* self = lbl_007E7808;
+  fn_X(self, idx, ...)`.
+- A `bool` built with `cmp rN, #1; movne rN, #0` (`moveq rN, #1` when the register is not
+  already 1): the source compares the `SQBool` with 1 (`a1 == 1`). `cmp rN, #0;
+  movne rN, #1` is the plain conversion (`a1 != 0`, or `a1` to a `bool` parameter).
+- Arguments loaded before the object pointer (`ldr r0, [sp, #4]; ldr r1, [sp]; sxtb ...;
+  ldr r0, =lbl`): store the result in a local before pushing it (`int r = fn_X(self, a0,
+  a1); sq_pushinteger(v, r);`).
+- Byte temporaries passed by address below the getter locals (`strb r0, [sp, #4]; ...;
+  mov r1, sp`): `unsigned char` locals declared before the getter locals, assigned in
+  reverse order (`y = a1; x = a0;`), passed to `const unsigned char&` parameters.
+- Constant arguments (`mov r2, #1`) after the script arguments: one callee shared by
+  several bindings with a kind number (`AddBattleEventMessage_` 0, `...FeatMessage_` 1,
+  `...OtherMessage_` 2).
+- Floats converted with `ftosis` and stored next to each other, then their address passed:
+  an `int` array initialized from the floats.
+- Not solved: an `unsigned char` argument where the original loads the object pointer
+  into a scratch register before masking the index, then moves it to r0
+  (`ldr r1, =lbl; ldr r0, [sp]; ldr r2, [r1]; and r1, r0, #0xff; mov r0, r2`). 21 bindings
+  of `BattleScriptFunc.cpp`. Tried with b921 and 5.04: self or direct, casts, `& 0xff`,
+  locals of each type, enums, inline wrappers and members, references, a `volatile` or
+  reference self, result locals, -O levels.
