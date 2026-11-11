@@ -28,6 +28,7 @@ squirrel/sqapi.cpp:
 	.text       start:0x006AD828 end:0x006ADFC4
 	.text       start:0x006ADFCC end:0x006AE8CC
 	.text       start:0x006AE9C4 end:0x006AEDD8
+	.rodata     start:0x0073E74C end:0x0073E75F
 
 squirrel/sqbaselib.cpp:
 	.text       start:0x00155668 end:0x001557FC
@@ -110,6 +111,7 @@ squirrel/sqfuncstate.cpp:
 	.text       start:0x0019F61C end:0x0019FDF0
 	.text       start:0x001A2050 end:0x001A29B4
 	.text       start:0x0026BAA8 end:0x0026BD00
+	.rodata     start:0x0076B42C end:0x0076B455
 
 squirrel/sqlexer.cpp:
 	.text       start:0x00177420 end:0x001792EC
@@ -133,7 +135,7 @@ squirrel/sqobject.cpp:
 	.text       start:0x001B7310 end:0x001B7398
 	.text       start:0x001C1B64 end:0x001C1BEC
 	.text       start:0x001EEC00 end:0x001EED74
-	.text       start:0x00216364 end:0x002163C0
+	.text       start:0x00216364 end:0x002163F4
 	.text       start:0x0022DFA8 end:0x0022DFB8
 	.text       start:0x002694FC end:0x0026BAA8
 	.text       start:0x0026BD00 end:0x0026BDB8
@@ -145,6 +147,7 @@ squirrel/sqobject.cpp:
 	.text       start:0x005CBA14 end:0x005CBABC
 	.text       start:0x00609838 end:0x00609BA0
 	.text       start:0x00609CE8 end:0x00609D28
+	.rodata     start:0x0074B058 end:0x0074B14B
 
 squirrel/sqstate.cpp:
 	.text       start:0x00146364 end:0x001482A8
@@ -189,4 +192,6 @@ squirrel/sqvm.cpp:
 	.text       start:0x001971D8 end:0x00197438
 	.text       start:0x0019774C end:0x00197CA4
 	.text       start:0x0019E9B0 end:0x0019EBD8
-	.text       start:0x00588B10 end:0x00588C88
+	.text       start:0x00588B10 end:0x00588F54
+	.rodata     start:0x0074B14C end:0x0074B2B7
+	.rodata     start:0x007A7B2C end:0x007A7B48
