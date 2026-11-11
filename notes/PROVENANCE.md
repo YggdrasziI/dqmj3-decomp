@@ -50,12 +50,13 @@ Source: [madler/zlib](https://github.com/madler/zlib) tag `v1.2.7` (commit
 `0e88ec14f594dec94b6dff66c2eddf5aae376d13`), Copyright (C) 1995-2012 Jean-loup Gailly and
 Mark Adler, **zlib license** (`libs/zlib/README`, copy in `LICENSES/Zlib-zlib.txt`). Copied
 on 2026-11-11 with the owner's approval: the library files of the release root
-(`*.c` and `*.h` without the `gz*` files, `README`).
+(`*.c` and `*.h` without the `gz*` files, `README`); `gzguts.h` added on the same day
+(`zutil.c` includes it without `Z_SOLO`).
 
 | Our files | Changes |
 |---|---|
 | `libs/zlib/*.{c,h}`, `libs/zlib/README` | none, except: |
-| `libs/zlib/zconf.h` | altered (notice at the top): `<sys/types.h>` not included (2026-11-11) |
+| `libs/zlib/stub/{fcntl.h,sys/types.h}` | our own empty headers, not zlib's: armcc 4.1 has neither (2026-11-11); `zconf.h` is unaltered again |
 | `libs/zlib/inflate.c`, `libs/zlib/deflate.c` | altered (notice at the top): `inflateInit2_` and `deflateInit2_` first call `fn_inline_00104C54(0, 0x0400028B)` (a name of this project's convention) (2026-11-11) |
 
 ## Scripts from DQMJ2

@@ -105,9 +105,12 @@ two components with no link between them:
     only; `inflate_table` with b791, b844, b1049, b1440, b1454 but not b894 or b921.
     1049, 1440 and 1454 find the same 20 functions.
 
-  Source: zlib 1.2.7, no `Z_SOLO`, `zconf.h` without `<sys/types.h>` (armcc 4.1 has
-  none), `--c90`. With b1049 and `--cpu=MPCoreNoVFP`, 30 functions of the copy are at
-  100 % (`notes/SPLITS.md`). `inflateInit2_` and `deflateInit2_` each start with an
+  Source: zlib 1.2.7, no `Z_SOLO`, `--c90`; armcc 4.1 has no `<sys/types.h>` (included
+  by `zconf.h`) or `<fcntl.h>` (by `gzguts.h`, which `zutil.c` includes without
+  `Z_SOLO`), so `libs/zlib/stub/` has empty ones. With b1049 and `--cpu=MPCoreNoVFP`, 32
+  functions of the copy are at 100 % (`notes/SPLITS.md`), with `zcalloc` and `zcfree`
+  (named from the references of `deflateInit2_`), whose calls named `malloc`
+  (0x002FE59C) and `free` (0x00301A1C). `inflateInit2_` and `deflateInit2_` each start with an
   added call `f(0, 0x0400028B)` to an empty function that armlink inlined (`mov r0, #0;
   ldr r1, =0x0400028B; mov r0, r0`). The same call, with another constant
   (0x04000000-0x0400029A, each used once), starts 21 other functions of SDK and network
@@ -179,7 +182,7 @@ No compiler identification string (`ARM C/C++ Compiler`, `RVCT`) is in `code.bin
 python tools/compiler_sweep.py --project <BigRed clone>
 python tools/compiler_sweep.py --flags "<flags> --no_dep_name" -I <sq>/include -I <sq>/squirrel <sq>/squirrel/*.cpp
 python tools/compiler_sweep.py --flags "--c90 --arm --cpu=MPCore --apcs=/interwork --split_sections -O3 -Otime" -I <dir with an empty sys/types.h> -I <zlib> <zlib>/{adler32,crc32,deflate,inflate,inffast,inftrees,trees,zutil,compress,uncompr}.c
-python tools/compiler_sweep.py --flags "--c90 --arm --cpu=MPCoreNoVFP --apcs=/interwork --split_sections -O3 -Otime" -I libs/zlib libs/zlib/{adler32,crc32,deflate,inflate,inffast,inftrees,trees,compress,uncompr}.c
+python tools/compiler_sweep.py --flags "--c90 --arm --cpu=MPCoreNoVFP --apcs=/interwork --split_sections -O3 -Otime" -I libs/zlib/stub -I libs/zlib libs/zlib/{adler32,crc32,deflate,inflate,inffast,inftrees,trees,zutil,compress,uncompr}.c
 ```
 
 Under Git Bash, set `MSYS_NO_PATHCONV=1` so that `/interwork` is not turned into a path.

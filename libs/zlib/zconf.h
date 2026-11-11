@@ -1,7 +1,3 @@
-/*
- * ALTERED SOURCE: changed to compile to the code of Dragon Quest Monsters: Joker 3;
- * this is not the original zlib 1.2.7 source. Changes are marked "DQMJ3".
- */
 /* zconf.h -- configuration of the zlib compression library
  * Copyright (C) 1995-2012 Jean-loup Gailly.
  * For conditions of distribution and use, see copyright notice in zlib.h
@@ -425,7 +421,7 @@ typedef uLong FAR uLongf;
 
 #ifdef STDC
 #  ifndef Z_SOLO
-     /* DQMJ3: <sys/types.h> is not included (armcc has none) */
+#    include <sys/types.h>      /* for off_t */
 #  endif
 #endif
 

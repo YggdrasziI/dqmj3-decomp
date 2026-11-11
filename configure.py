@@ -178,7 +178,7 @@ config.libs = [
         # CPU: deflate matches with builds 1049, 1440 and 1454 only, inflate_table not with
         # 894 or 921 (1049 taken, the three are not told apart), and the copy matches only
         # with --cpu=MPCoreNoVFP. Built without Z_SOLO: its default allocator is there
-        # (zconf.h altered, armcc has no <sys/types.h>). A unit claims only the functions of
+        # (libs/zlib/stub has the headers armcc lacks). A unit claims only the functions of
         # that copy found byte for byte; the image also has a zlib 1.2.5 copy
         # (notes/COMPILER.md, notes/SPLITS.md).
         "lib": "zlib",
@@ -193,11 +193,14 @@ config.libs = [
             "-O3",
             "-Otime",
             "--no_dep_name",
+            "-Ilibs/zlib/stub",
         ],
         "progress_category": "lib",
         "objects": [
             Object(NonMatching, f"zlib/{name}.c")
-            for name in ("adler32", "crc32", "deflate", "inffast", "inflate", "inftrees", "trees")
+            for name in (
+                "adler32", "crc32", "deflate", "inffast", "inflate", "inftrees", "trees", "zutil",
+            )
         ],
     },
 ]

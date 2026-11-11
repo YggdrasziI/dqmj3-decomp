@@ -240,3 +240,6 @@ zlib/trees.c:
 	.text       start:0x0069AAAC end:0x0069B6E4
 	.text       start:0x006A5F78 end:0x006A6088
 	.text       start:0x006A6198 end:0x006A6718
+
+zlib/zutil.c:
+	.text       start:0x006A0010 end:0x006A0028
