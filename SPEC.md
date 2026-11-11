@@ -70,7 +70,9 @@ Evidence and the candidate analysis go in `notes/COMPILER.md`. How the build wor
 - **Compiler:** RVCT 4.1 build 921 (`armcc`), flags `--cpp --arm --cpu=MPCore
   --fpmode=fast --apcs=/interwork --split_sections -O3 -Otime --no_rtti --no_rtti_data
   --signed_chars`. Identified among the 14 builds of decomp.me's `armcc.zip` by
-  compiling Squirrel 2.2.5 and zlib 1.2.7 (`notes/COMPILER.md`).
+  compiling Squirrel 2.2.5 and zlib 1.2.7 (`notes/COMPILER.md`). The script binding
+  files match better with ARM Compiler 5.04 b82 and the same flags: the `game` library
+  uses it (`notes/COMPILER.md`).
 - **No armlink:** the original linker is not available. `tools/ctr/` (after BigRed)
   splits the original image into one relocatable object per unit, and links compiled
   objects back at the addresses of `symbols.txt`, reproducing what armlink did to the

@@ -149,6 +149,7 @@ SQUIRREL_MATCHING = {"sqdebug", "sqtable", "sqstate", "sqlexer"}
 config.libs = [
     {
         "lib": "game",
+        "armcc_version": "5.04/b82",  # notes/COMPILER.md
         "cflags": cflags_base,
         "progress_category": "game",
         "objects": [

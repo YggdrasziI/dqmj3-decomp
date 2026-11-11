@@ -73,7 +73,9 @@ from the disassembly, then the exceptions by hand.
   last write of a register before the call.
 - A function returning a vector of three floats returns it in `s0`-`s2` (VFP ABI,
   `fstmias r2, {s0, s1, s2}` after the call); one returning `ldmia r0` returns a pointer.
-- Two adjacent float locals copied into a struct with `ldrd`/`strd`: armcc does it for an
-  inline member that assigns the fields (`offset.Set(0.0f, a1, a2)`), not for an aggregate
-  initializer or a constructor (word or VFP copies). armcc does not follow the declaration
-  order of locals when it lays out the stack: moving declarations did not change it.
+- Two adjacent float locals copied into a struct with `ldrd`/`strd`: with b921, armcc does
+  it for an inline member that assigns the fields (`offset.Set(0.0f, a1, a2)`). With 5.04
+  the same member gives the original stack layout but a VFP copy, and assigning a
+  two-float struct gives the `ldrd`/`strd` copy with the vector below the arguments
+  (`SetTalkCameraEyeOffset_`, 93.9 %). armcc does not follow the declaration order of
+  locals when it lays out the stack: moving declarations did not change it.

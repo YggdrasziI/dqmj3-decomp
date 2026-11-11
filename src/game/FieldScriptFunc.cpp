@@ -240,9 +240,6 @@ SQInteger SetPos_(HSQUIRRELVM v) {
     return 0;
 }
 
-// 92.8 %: the original copies the vector with ldmia r0, {r0, r1, r2}; this
-// copies it as ldmia r0, {r1, r2} + ldr r0, [r0, #8] (pointer, memcpy, member
-// and derived-struct forms give the same).
 SQInteger GetPos_(HSQUIRRELVM v) {
     SQInteger a0;
     if (SQ_FAILED(sq_getinteger(v, -1, &a0))) {
@@ -1577,9 +1574,16 @@ SQInteger SetTalkCameraType_(HSQUIRRELVM v) {
     return 0;
 }
 
-// 91.9 %: the original keeps a1 and a2 at sp+4 and the vector at sp+0xC and
-// copies a1 and a2 with ldrd/strd; armcc puts the vector first here whatever
-// the declaration order (a Set() method gives the ldrd/strd copy).
+// An inline member that assigns the three fields: it gives the stack layout of
+// SetTalkCameraEyeOffset_ and SetTalkCameraTargetOffset_.
+struct UnkVec3Set : UnkVec3 {
+    void Set(float x_, float y_, float z_) { x = x_; y = y_; z = z_; }
+};
+
+// 93.9 %: the stack layout matches (a1 and a2 at sp+4, the vector at sp+0xC),
+// but the original copies a1 and a2 into the vector with ldrd/strd, this with
+// VFP loads and fstmias. Forms that give the ldrd/strd copy (a two-float struct
+// assigned to the last two fields) put the vector below the arguments.
 SQInteger SetTalkCameraEyeOffset_(HSQUIRRELVM v) {
     SQInteger a0;
     SQFloat a1;
@@ -1596,13 +1600,14 @@ SQInteger SetTalkCameraEyeOffset_(HSQUIRRELVM v) {
 #line 1286
         return SCRIPT_ERROR(v, "failed: sq_getfloat");
     }
-    UnkVec3 offset = {0.0f, a1, a2};
+    UnkVec3Set offset;
+    offset.Set(0.0f, a1, a2);
     void* self = lbl_007E7808;
     fn_001E023C(self, a0, &offset);
     return 0;
 }
 
-// 91.9 %: same difference as SetTalkCameraEyeOffset_.
+// 94.0 %: same difference as SetTalkCameraEyeOffset_.
 SQInteger SetTalkCameraTargetOffset_(HSQUIRRELVM v) {
     SQInteger a0;
     SQFloat a1;
@@ -1619,7 +1624,8 @@ SQInteger SetTalkCameraTargetOffset_(HSQUIRRELVM v) {
 #line 1301
         return SCRIPT_ERROR(v, "failed: sq_getfloat");
     }
-    UnkVec3 offset = {0.0f, a1, a2};
+    UnkVec3Set offset;
+    offset.Set(0.0f, a1, a2);
     void* self = lbl_007E7808;
     fn_001E0AD0(self, a0, &offset);
     return 0;
@@ -2871,8 +2877,6 @@ SQInteger SetFogDistMax_(HSQUIRRELVM v) {
     } \
     sq_pop((v), 1)
 
-// 99.2 %: registers permuted (v in r6, the zero in r5, &info in r4 in the
-// original); aggregate, pointer and declaration-order variants do not fix it.
 SQInteger SetAnalyzeInfo_(HSQUIRRELVM v) {
     UnkAnalyzeInfo info;
     SQInteger typeId;

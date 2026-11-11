@@ -7,7 +7,8 @@ Anything without evidence is marked as a hypothesis.
 
 | Item | Value | Status |
 |---|---|---|
-| Compiler (game code) | RVCT 4.1 build 921 (`armcc`) | proven among the 14 builds of decomp.me's `armcc.zip` (Squirrel sweep) |
+| Compiler (Squirrel, built with the game) | RVCT 4.1 build 921 (`armcc`) | proven among the 14 builds of decomp.me's `armcc.zip` (Squirrel sweep) |
+| Compiler (script bindings) | ARM Compiler 5.04 b82 | proven against b921 on the script binding units (below); the only 5.x build in the archive, so a nearby 5.x build is not ruled out |
 | Compiler (CTR-SDK zlib) | RVCT 4.1 build 1049, 1440 or 1454, `--cpu=MPCoreNoVFP`, `-O3 -Otime`, C90 | proven (zlib sweep); the three builds are not told apart |
 | Optimisation | `-O3 -Otime` | proven (Squirrel, zlib) |
 | `--fpmode=fast`, `--signed_chars` | yes | proven (Squirrel) |
@@ -176,6 +177,18 @@ only matter for sources with Japanese literals, `--force_new_nothrow` for code w
 base flags, and is linked from source. It is too small to tell builds apart (it also
 matches with 4.0 and 5.04).
 
+### Script bindings: ARM Compiler 5.04 (2026-11-11)
+
+Each binding unit was built with each build (the game flags of `configure.py`) and its
+functions counted at 100 % in the objdiff report.
+
+`FieldScriptFunc.cpp` (186 functions): 181 with b921, 183 with 5.04 b82; `GetPos_` and
+`SetAnalyzeInfo_` match with 5.04 only, none with b921 only.
+
+So `configure.py` sets `armcc_version="5.04/b82"` on the `game` library. Squirrel, built
+with the game, matches with b921 (above) and finds 71 functions with 5.04: the image
+holds code from at least two compilers. Which game files used which is open.
+
 ## Libraries seen in the image
 
 | Library | Evidence |
@@ -198,6 +211,8 @@ No compiler identification string (`ARM C/C++ Compiler`, `RVCT`) is in `code.bin
   try every build with `--cpu=MPCore` and `--cpu=MPCoreNoVFP`.
 - Thumb code (332 functions): which flags.
 - The static initializer of `sqstate.cpp` (above): matches with 5.04 only.
+- Which game files were built with 5.04 (the script bindings were, above) and which
+  with 4.1 b921.
 
 ## Reproducing
 
