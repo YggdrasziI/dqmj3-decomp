@@ -2,9 +2,10 @@
 """
 Names the targets of calls and references of matched functions in symbols.txt.
 
-A function whose bytes match the original (objdiff 100 % with relocation targets
-ignored, the report's default) makes the same calls and references, at the same
-offsets, as the original. Where the original refers to an analysis name
+A function whose bytes match the original (relocated words masked, same relocation
+offsets and types) makes the same calls and references, at the same offsets, as the
+original. The report compares relocation targets, so such a function is below 100 %
+there until its targets are named: the bytes are compared here instead. Where the original refers to an analysis name
 (fn_<addr> / lbl_<addr>) and our compiled object refers to a real name at the same
 offset, with the same relocation type and the same addend, the analysis name is that
 real name.
@@ -72,6 +73,34 @@ def function_relocs(obj, name):
     return None
 
 
+def function_section(obj, name):
+    """The code section that defines function `name`, or None."""
+    for sym in obj.symbols:
+        if sym.name == name and sym.is_defined and sym.shndx < len(obj.sections):
+            section = obj.sections[sym.shndx]
+            return section if section.is_code else None
+    return None
+
+
+def bytes_match(orig, ours, name):
+    """Same size, same relocation offsets and types, same bytes outside the relocated words."""
+    a, b = function_section(orig, name), function_section(ours, name)
+    if a is None or b is None or len(a.data) != len(b.data):
+        return False
+    ra = {r.offset: r.type for r in a.relocs}
+    rb = {r.offset: r.type for r in b.relocs}
+    if ra != rb:
+        return False
+    da, db = bytearray(a.data), bytearray(b.data)
+    for offset, rtype in ra.items():
+        # a call keeps its condition and opcode byte; other relocated words are masked whole
+        span = range(offset, offset + 3) if rtype in CALLS else range(offset, offset + 4)
+        for i in span:
+            if i < len(da):
+                da[i] = db[i] = 0
+    return da == db
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[1])
     parser.add_argument("--dry-run", action="store_true")
@@ -95,13 +124,11 @@ def main() -> None:
         name = unit["name"]
         if name.startswith("auto/"):
             continue
-        matched = [f["name"] for f in unit.get("functions", []) if f.get("fuzzy_match_percent") == 100]
-        if not matched:
-            continue
         paths = (DELINK / f"{name}.o", DIFF / f"{name}.o")
         if not all(p.is_file() for p in paths):
             continue
         orig, ours = objects.setdefault(name, tuple(elf.ElfFile.load(p) for p in paths))
+        matched = [f["name"] for f in unit.get("functions", []) if bytes_match(orig, ours, f["name"])]
         for fn in matched:
             a, b = function_relocs(orig, fn), function_relocs(ours, fn)
             if a is None or b is None:
