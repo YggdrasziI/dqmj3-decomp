@@ -250,10 +250,14 @@ class Splitter:
         # armcc excludes a trailing pool only when it contains solely LDR
         # literals. Mixed pools (for example inline strings or VFP constants)
         # remain part of the function symbol, even if they end in LDR literals.
+        # Some functions keep an LDR-only pool too (build_tree in zlib's trees.c):
+        # the attribute keep_pool in symbols.txt marks them.
         size_end = end
         code_end = max(info.code, default=start - step) + step
         pool_start = (code_end + 3) & ~3
-        if pool_start < end and all(addr in info.ldr_pool for addr in range(pool_start, end, 4)):
+        if "keep_pool" in sym.extra:
+            pass
+        elif pool_start < end and all(addr in info.ldr_pool for addr in range(pool_start, end, 4)):
             while size_end - 4 >= start and (size_end - 4) in info.ldr_pool:
                 size_end -= 4
         if sym.thumb and size_end < end and size_end - 2 >= start:
