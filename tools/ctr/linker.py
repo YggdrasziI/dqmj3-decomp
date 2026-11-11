@@ -205,7 +205,10 @@ class PlacedObject:
             instruction = self.ctx.config.inlined_functions.get(sym.name)
             if instruction is None or not sym.is_defined or sym.bind == elf.STB_LOCAL:
                 continue
-            body = struct.pack("<II", instruction, arm.ARM_BX_LR)
+            if instruction == arm.ARM_BX_LR:  # an empty function
+                body = struct.pack("<I", instruction)
+            else:
+                body = struct.pack("<II", instruction, arm.ARM_BX_LR)
             section = (
                 self.elf.sections[sym.shndx] if sym.shndx < len(self.elf.sections) else None
             )
@@ -414,6 +417,9 @@ class PlacedObject:
             # Declared in config.toml; its body is checked wherever it is defined
             if target_offset != 0:
                 return None
+            if instruction == arm.ARM_BX_LR:
+                # An empty function: armlink replaced the call with mov r0, r0
+                return (arm.arm_cond(insn) << 28) | (arm.ARM_MOV_R0_R0 & 0x0FFFFFFF)
             return inline_body(insn, instruction)
         if (sym.type != elf.STT_FUNC or not sym.is_defined or sym.value & 1
                 or sym.shndx >= len(self.elf.sections) or sym.shndx in self.placements
