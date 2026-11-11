@@ -157,6 +157,19 @@ build, 148 with 5.04. Mostly SDK and runtime code in 0x00100000-0x001BFFFF. Some
 there (sead) come from functions identical to generic code, and are not evidence that
 this game uses those libraries.
 
+### Flags of RedPepper (Super Mario 3D Land, 2026-11-11)
+
+RedPepper builds its game, sead and nnsdk with `--apcs=//interwork --cpu=MPCore
+--fpmode=fast --cpp --arm --force_new_nothrow --signed_chars --multibyte-chars
+--locale=japanese --no_vfe --no_rtti_data --no_rtti --no_exceptions -O3 -Otime
+--data-reorder --split_sections --forceinline` (another game, so a lead only). The flags
+proven here are all in it. The three that are not in `cflags_base` were each added to it
+and the project rebuilt (Squirrel, zlib 1.2.5, the game unit): `--data-reorder`,
+`--force_new_nothrow`, `--multibyte-chars --locale=japanese` change nothing in the report
+(no regression, no gain). Not proven, not ruled out; not added. `--locale=japanese` can
+only matter for sources with Japanese literals, `--force_new_nothrow` for code with
+`new`, `--data-reorder` for objects with several data items.
+
 ### First game unit
 
 `SetFogDensity_` (0x002546FC, `src/game/FieldScriptFunc.cpp`) matches with b921 and the

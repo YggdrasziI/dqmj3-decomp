@@ -23,6 +23,16 @@ first. Every reuse is logged in `notes/PROVENANCE.md`.
   as an example; no code taken. Has the same CTR-SDK call `f(0, 0x0400xxxx)` to an empty
   function inlined by armlink (`func_0014f7e8`, no real name either).
 
+- [3dsdecomp](https://github.com/3dsdecomp) (read only, no code taken):
+  [RedPepper](https://github.com/3dsdecomp/RedPepper) (Super Mario 3D Land EU, armcc
+  matching decompilation, **GPL-3.0**): compiler and armlink flags (`CMakeLists.txt`,
+  `notes/COMPILER.md`), and `Symbols/lib/armlib/c_4.l/*.sym`, RVCT C library functions
+  listed by library object (`strcmp`, `strstr`, `__printf`, `_printf_*`, ...): leads for
+  the C-library regions. `nnsdk` (6 CTR-SDK files: `dbg`, `fs`, `math`, `srv`, `svc`),
+  `sead` (6 files), `LibMessageStudio` (MSBT; not in this game: no `MsgStdBn`) and
+  `RedPepper-Headers` have **no license**. Their SDK is older (2011) than this game's.
+  Names from them are leads only.
+
 ## Tools
 
 - [3DSGuy/Project_CTR](https://github.com/3DSGuy/Project_CTR) `ctrtool` v1.2.1:
