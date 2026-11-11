@@ -79,9 +79,11 @@ squirrel/sqclass.cpp:
 	.text       start:0x00197CA4 end:0x001982E0
 	.text       start:0x0019B7C0 end:0x0019B8EC
 	.text       start:0x001C1B38 end:0x001C1B64
-	.text       start:0x001C1BEC end:0x001C1C50
+	.text       start:0x001C1BEC end:0x001C1E1C
 	.text       start:0x005CB270 end:0x005CB34C
-	.text       start:0x005CB484 end:0x005CB6E8
+	.text       start:0x005CB484 end:0x005CB928
+	.rodata     start:0x0077905C end:0x0077907C
+	.rodata     start:0x007A7E18 end:0x007A7E34
 
 squirrel/sqcompiler.cpp:
 	.text       start:0x00164414 end:0x001645A0
