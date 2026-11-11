@@ -16,15 +16,8 @@
 #include <stddef.h>
 #include <string.h>
 
-#include "game/squirrel_api.h"
-
-// A vector of three floats: fn_001446AC reads it from a script table with the
-// keys "x", "y" and "z" (0x001447AC), fn_001447BC pushes one back.
-struct UnkVec3 {
-    float x;
-    float y;
-    float z;
-};
+#define SCRIPT_FILE "FieldScriptFunc.cpp"
+#include "game/script_bindings.h"
 
 // Filled by SetAnalyzeInfo_ from a script table; the field names are the table's
 // keys ("flagId", "searchDist", "nameKey", "messageKey"), id is its first argument.
@@ -43,10 +36,6 @@ struct Unk0060DA04 {
 };
 
 extern "C" {
-// Stubbed out in this build: returns "" (0x001446A0, 12 bytes).
-const char* fn_001446A0(const char* msg, const char* file, const char* func, int line);
-SQRESULT fn_001446AC(UnkVec3* out, HSQUIRRELVM v, SQInteger idx);
-SQRESULT fn_001447BC(HSQUIRRELVM v, const UnkVec3* vec);
 void fn_001BB68C(void* self, int, int);
 void fn_001CE0F4(void* self, bool a0);
 int fn_001D9DB4(void* self, const char* a0, int a1, const UnkVec3* pos);
@@ -235,13 +224,8 @@ int fn_0060E6D4(void* self, int);
 int fn_0060E710(void* self, const char*);
 void fn_0060E768(void* self, const char*, unsigned char);
 void* fn_0064DCE8(void* self);
-extern void* lbl_007E7808;
 extern void* lbl_007E5984;
 }
-
-// The original passes the bare file name, not the compiler's __FILE__.
-#define SCRIPT_ERROR(v, msg) \
-    sq_throwerror((v), fn_001446A0((msg), "FieldScriptFunc.cpp", __FUNCTION__, __LINE__))
 
 SQInteger SetPos_(HSQUIRRELVM v) {
     SQInteger a0;
