@@ -245,7 +245,7 @@ never labelled.
   `i.<name>`. Split objects only have `i.`, and objdiff pairs functions by section name, so `t.` is renamed
   to `i.` in the object objdiff reads.
 - `tools/ctr/split.py`: the size of a split function leaves out a trailing literal pool that holds only LDR
-  literals, as armcc usually does (BigRed's rule). armcc does not always: `build_tree` (zlib) keeps its
+  literals, as armcc usually does (BigRed's rule). armcc does not always: `build_tree` (both zlib copies) keeps its
   8-byte LDR pool in its size, and nothing found so far tells the two cases apart (88 of 299 compiled
   functions with a trailing pool keep it, most of them because the pool holds strings). The attribute
   `keep_pool` on a function in `symbols.txt` keeps the pool in the split symbol's size; objdiff compares

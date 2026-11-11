@@ -45,10 +45,10 @@ first. Every reuse is logged in `notes/PROVENANCE.md`.
 - zlib 1.2.7 (zlib license, [madler/zlib](https://github.com/madler/zlib) tag
   `v1.2.7`): the CTR-SDK copy of zlib in the image (`1.2.7.f-NINTENDO-CTR-SDK-v1`, which
   may differ from the public release). Copied into `libs/zlib/` (approved by the owner,
-  2026-11-11). zlib 1.2.5 (tag `v1.2.5`, same license): the image's second copy; used for
-  the compiler sweep only, not copied (`notes/COMPILER.md`).
+  2026-11-11). zlib 1.2.5 (tag `v1.2.5`, same license): the image's second copy, copied into
+  `libs/zlib-1.2.5/` (approved by the owner, 2026-11-11, `notes/COMPILER.md`).
 - Squirrel 2.2.5 stable (zlib license, `squirrel_2.2.5_stable.tar.gz` from
   [SourceForge](https://sourceforge.net/projects/squirrel/files/squirrel2/)): the
   game's scripting language. Copied into `libs/squirrel/` (approved by the owner for
-  Squirrel and zlib 1.2.7 only; other zlib-licensed code still needs approval). Used for the compiler
+  Squirrel, zlib 1.2.7 and zlib 1.2.5 only; other zlib-licensed code still needs approval). Used for the compiler
   sweep.

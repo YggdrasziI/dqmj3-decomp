@@ -123,17 +123,27 @@ two components with no link between them:
   as an empty function; the source change is marked `DQMJ3` in `libs/zlib/inflate.c`
   and `deflate.c`. That every site calls the same function is a hypothesis too.
 - **zlib 1.2.5**: called from the network block (0x0040F940, which refers to the string
-  `1.2.5` at 0x0073C75C, calls `deflateInit2_` 0x006A3248). zlib 1.2.5 (public release)
-  with the same flags (an empty `sys/types.h` on the include path) finds 20 functions with
-  build 921 (22 with 1049, 1440, 1454; 19 with 894), all in this component:
+  `1.2.5` at 0x0073C75C, calls `deflateInit2_` 0x006A3248). The public 1.2.5 source,
+  unaltered, with `--cpu=MPCore` (the game's CPU, not the SDK copy's `MPCoreNoVFP`) and
+  `--c90`, finds 20 functions with build 921, 22 with 1049, 1440 and 1454, 19 with 894;
+  with 1049 all 30 functions of the copy are at 100 % (2026-11-11, `notes/SPLITS.md`):
+  `adler32` 0x006A1860, `crc32` 0x006A1C10, `crc32_big` 0x006968A0, `deflate` 0x006A20E8,
+  `deflateEnd` 0x006A3168, `deflateInit2_` 0x006A3248, `deflateReset` 0x006A34D4,
   `deflate_fast` 0x006974D4, `deflate_slow` 0x00698264, `deflate_stored` 0x00698B94,
-  `fill_window` 0x0069912C, `flush_pending` 0x006994F0, `deflateInit2_` 0x006A3248,
-  `deflateReset` 0x006A34D4, `inflateInit2_` 0x006A500C, `inflateReset` 0x006A5150,
-  `inflate_fast` 0x006A51E4, `updatewindow` 0x006B0CA8, `build_tree` 0x006951B4,
-  `compress_block` 0x00695E8C, `send_tree` 0x006A6718, `_tr_align` 0x006A0B2C,
-  `_tr_flush_block` 0x006A0E2C, `_tr_init` 0x006A153C, `_tr_stored_block` 0x006A168C. Its
-  default allocator is 0x006A5F60. Not named: two copies can not share a name in
-  `symbols.txt`, and the names of this copy (a prefix?) are not known.
+  `fill_window` 0x0069912C, `flush_pending` 0x006994F0, `inflate` 0x006A360C,
+  `inflateEnd` 0x006A4FB0, `inflateInit_` 0x006A4FFC (a tail call to `inflateInit2_`,
+  which this copy does not inline), `inflateInit2_` 0x006A500C, `inflateReset`
+  0x006A5150, `inflate_fast` 0x006A51E4, `updatewindow` 0x006B0CA8, `inflate_table`
+  0x006A594C, `build_tree` 0x006951B4 (an LDR-only trailing pool in its size, like the
+  SDK copy's), `compress_block` 0x00695E8C, `scan_tree` 0x006A6088, `send_tree`
+  0x006A6718, `_tr_align` 0x006A0B2C, `_tr_flush_block` 0x006A0E2C, `_tr_init`
+  0x006A153C, `_tr_stored_block` 0x006A168C, `zcalloc` 0x006A5F60, `zcfree` 0x006A5F68.
+  It has no marker call. Two copies can not share a name in `symbols.txt` and the names
+  this copy had in the image (a prefix?) are not known, so its functions keep their
+  analysis names (`fn_<address>`); its units are compiled with
+  `--preinclude=libs/zlib-1.2.5/stub/names.h`, which maps each zlib name to that
+  `fn_<address>` (and its data, `lbl_<address>`). Those `#define`s are this project's
+  file, not evidence of a name.
 
 With 1.2.7 and `--cpu=MPCore`: `-O3 -Ospace` and `-O2 -Ospace` find none, `-O2 -Otime` one; `build_tree`
 (1.2.5 copy) matches with builds 921, 1049, 1440, 1454 only, `inflate_fast` (1.2.5 copy)
@@ -159,7 +169,7 @@ matches with 4.0 and 5.04).
 |---|---|
 | CTR-SDK | `nn::` error strings, e.g. `nn::ac::Initialize() failed` at 0x001ABA78 |
 | zlib 1.2.7 (SDK build) | version string at 0x0047AFF4; functions above |
-| zlib 1.2.5 | string `1.2.5` at 0x0073C75C; functions above (second copy) |
+| zlib 1.2.5 | string `1.2.5` at 0x0073C75C; 30 functions above (second copy) |
 | Squirrel 2.2.5 | version string at 0x001557C0; 224 functions above |
 | NEX and PIA | `nn::nex::RootTransport` at 0x0074A596; `NN_PIA_SESSION_MAX_SILENCE_TIME_MAX` at 0x0073E509 |
 | NintendoWare for CTR | `battle_font_0.bflim` at 0x007B3988, `break_font.bffnt` at 0x007BDBB0, `Eft_Ptcl_PlaneXY.vsh` at 0x007535A6 |

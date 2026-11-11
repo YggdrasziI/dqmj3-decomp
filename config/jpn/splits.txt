@@ -243,3 +243,38 @@ zlib/trees.c:
 
 zlib/zutil.c:
 	.text       start:0x006A0010 end:0x006A0028
+
+zlib-1.2.5/adler32.c:
+	.text       start:0x006A1860 end:0x006A1C10
+
+zlib-1.2.5/crc32.c:
+	.text       start:0x006968A0 end:0x00696E58
+	.text       start:0x006A1C10 end:0x006A20E8
+
+zlib-1.2.5/deflate.c:
+	.text       start:0x006974D4 end:0x00697AD4
+	.text       start:0x00698264 end:0x006989B4
+	.text       start:0x00698B94 end:0x00698D2C
+	.text       start:0x0069912C end:0x0069946C
+	.text       start:0x006994F0 end:0x00699578
+	.text       start:0x006A20E8 end:0x006A360C
+
+zlib-1.2.5/inffast.c:
+	.text       start:0x006A51E4 end:0x006A594C
+
+zlib-1.2.5/inflate.c:
+	.text       start:0x006A360C end:0x006A51E4
+	.text       start:0x006B0CA8 end:0x006B0DD0
+
+zlib-1.2.5/inftrees.c:
+	.text       start:0x006A594C end:0x006A5F60
+
+zlib-1.2.5/trees.c:
+	.text       start:0x006951B4 end:0x00695A08
+	.text       start:0x00695E8C end:0x006962E8
+	.text       start:0x006A0B2C end:0x006A1860
+	.text       start:0x006A6088 end:0x006A6198
+	.text       start:0x006A6718 end:0x006A6C80
+
+zlib-1.2.5/zutil.c:
+	.text       start:0x006A5F60 end:0x006A5F78

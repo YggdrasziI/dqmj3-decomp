@@ -203,6 +203,34 @@ config.libs = [
             )
         ],
     },
+    {
+        # zlib 1.2.5 (zlib license, libs/zlib-1.2.5/README), the copy the network library
+        # calls: its functions match with --cpu=MPCore and build 1049 (not the SDK copy's
+        # MPCoreNoVFP). Both copies define the same names, so this one is compiled under
+        # its analysis names (libs/zlib-1.2.5/stub/names.h, notes/COMPILER.md).
+        "lib": "zlib-1.2.5",
+        "src_dir": "libs",
+        "armcc_version": "4.1/b1049",
+        "cflags": [
+            "--c90",
+            "--arm",
+            "--cpu=MPCore",
+            "--apcs=/interwork",
+            "--split_sections",
+            "-O3",
+            "-Otime",
+            "--no_dep_name",
+            "-Ilibs/zlib/stub",
+            "--preinclude=libs/zlib-1.2.5/stub/names.h",
+        ],
+        "progress_category": "lib",
+        "objects": [
+            Object(NonMatching, f"zlib-1.2.5/{name}.c")
+            for name in (
+                "adler32", "crc32", "deflate", "inffast", "inflate", "inftrees", "trees", "zutil",
+            )
+        ],
+    },
 ]
 
 # Optional extra categories for progress tracking

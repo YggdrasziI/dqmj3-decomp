@@ -59,6 +59,21 @@ on 2026-11-11 with the owner's approval: the library files of the release root
 | `libs/zlib/stub/{fcntl.h,sys/types.h}` | our own empty headers, not zlib's: armcc 4.1 has neither (2026-11-11); `zconf.h` is unaltered again |
 | `libs/zlib/inflate.c`, `libs/zlib/deflate.c` | altered (notice at the top): `inflateInit2_` and `deflateInit2_` first call `fn_inline_00104C54(0, 0x0400028B)` (a name of this project's convention) (2026-11-11) |
 
+## zlib 1.2.5
+
+Source: [madler/zlib](https://github.com/madler/zlib) tag `v1.2.5` (tag object
+`41fd7e507609681a7ae9e641363b0fed60ea708b`, commit
+`9712272c78b9d9c93746d9c8e156a3728c65ca72`, GitHub archive `v1.2.5.tar.gz` SHA-1
+`a4e8adc8bd7d920ffa79e25c823e2b906894a61f`), Copyright (C) 1995-2010 Jean-loup Gailly and
+Mark Adler, **zlib license** (`libs/zlib-1.2.5/README`, same terms as
+`LICENSES/Zlib-zlib.txt`). Copied on 2026-11-11 with the owner's approval: the library
+files of the release root (`*.c` and `*.h` without the `gz*` files, `README`).
+
+| Our files | Changes |
+|---|---|
+| `libs/zlib-1.2.5/*.{c,h}`, `libs/zlib-1.2.5/README` | none |
+| `libs/zlib-1.2.5/stub/names.h` | our own header, not zlib's: `#define`s from zlib names to this copy's analysis names, passed with `--preinclude` (2026-11-11) |
+
 ## Scripts from DQMJ2
 
 Source: the owner's DQMJ2 decompilation (`YggdrasziI/dqmj2-decomp`, CC0-1.0), commit
