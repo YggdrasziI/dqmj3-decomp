@@ -55,7 +55,7 @@ Source: the owner's DQMJ2 decompilation (`YggdrasziI/dqmj2-decomp`, CC0-1.0), co
 | `tools/asm_compare.py` | objdiff-cli from `build/tools/`; examples and wording for this project's units (`auto/` instead of dsd delinks); the objdiff call split into helpers shared with `why_diff.py` |
 | `tools/why_diff.py` | `--trace` (mwccarm coloring trace through `tools/mwcc_sched.py`) removed; `--objects` added; VFP registers (`sN`, `dN`) counted as registers; `add rN, pc, #imm` counted as a literal pool offset; the kinds marked as carried over from mwccarm |
 | `tools/unit_candidates.py` | rewritten for `code.bin`: functions outside every `splits.txt` range, calls from the relocations of the split objects; modules, overlays and fixed game regions removed; optional `--region` from `config.toml` |
-| `tools/permute.py` | armcc instead of mwccarm, with the unit's command from `build.ninja`; variants prelinked (`tools/ctr/prelink.py`) and compared with `build/<version>/delink/`; the word scorer reads objects with `tools/ctr/elf.py`; the `__typeof__` mutations removed (armcc rejects `__typeof__` with this project's flags); loop counters use `unsigned int` instead of `u32` |
+| `tools/permute.py` | armcc instead of mwccarm, with the unit's command from `build.ninja`; variants prelinked (`tools/ctr/prelink.py`) and compared with `build/<version>/delink/`; the word scorer reads objects with `tools/ctr/elf.py`; the `__typeof__` mutations removed (armcc rejects `__typeof__` with this project's flags); loop counters use `unsigned int` instead of `u32`; finds methods defined in their class body |
 
 ## Own scripts
 

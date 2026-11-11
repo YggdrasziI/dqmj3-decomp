@@ -333,6 +333,33 @@ def locate(symbol):
     return head + r"%s::%s\([^;{]*\{\n" % (cls, re.escape(name))
 
 
+def locate_in_class(symbol, text):
+    """Match of the definition of a method written in its class body (indented, without
+    `Class::`), searched within the body of `class|struct <Class>`."""
+    m = re.match(r"_ZNK?(\d+)", symbol)
+    if not m:
+        return None
+    p = m.end(1)
+    cls = symbol[p : p + int(m.group(1))]
+    rest = symbol[p + int(m.group(1)) :]
+    c = re.match(r"(C|D)[0-9]", rest)
+    if c:
+        name = cls if c.group(1) == "C" else "~" + cls
+    else:
+        q = re.match(r"(\d+)", rest)
+        if not q:
+            return None
+        name = rest[q.end() : q.end() + int(q.group(1))]
+    k = re.search(r"^(?:class|struct)\s+%s\b[^;{]*\{" % re.escape(cls), text, re.M)
+    if not k:
+        return None
+    end = body_end(text, k.end()) or len(text)
+    # Indented, not a comment, a call in a condition or an assignment
+    head = r"^[ \t]+(?!//)(?![^\n]*\b(?:if|while|for|switch|return)\b)[^\n;#=(]*"
+    rx = re.compile(head + r"(?<![\w~])%s\([^;{]*\{\n" % re.escape(name), re.M)
+    return rx.search(text, k.end(), end)
+
+
 def body_end(text, start):
     """Index just after the newline that follows the brace closing the body opened
     right before `start`; braces in comments, strings and characters do not count."""
@@ -495,6 +522,8 @@ def main():
     text = raw.replace("\r\n", "\n")
     rx = locate(o.symbol)
     m = re.search(rx, text, re.M) if rx else None
+    if not m:
+        m = locate_in_class(o.symbol, text)
     if not m:
         sys.exit("definition not found: " + o.symbol)
     s0 = m.end()
