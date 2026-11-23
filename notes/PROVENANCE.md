@@ -7,8 +7,8 @@ license and the changes made.
 
 Source: [T3CHNOLOG1C/BigRed](https://github.com/T3CHNOLOG1C/BigRed) (New Super Mario
 Bros. 2 decompilation, **CC0-1.0**), commit `3236a656edbb8c6f353b53779445fed18c9cb4df`,
-copied on 2026-11-10. `tools/ninja_syntax.py` is from the Ninja project (Copyright 2011
-Google Inc., **Apache-2.0**, notice kept, license in `LICENSES/Apache-2.0.txt`).
+copied on 2026-11-10. BigRed's `tools/ninja_syntax.py` was replaced on 2026-11-23 by
+the one of `tools/common/` (below).
 
 | Our file | Changes |
 |---|---|
@@ -26,7 +26,7 @@ Google Inc., **Apache-2.0**, notice kept, license in `LICENSES/Apache-2.0.txt`).
 | `tools/ctr/strpool.py` | padding (zero, 0xFF) between strings skipped; a pointer to a terminator is the empty string; `literal_containing` |
 | `tools/download_tool.py` | generic User-Agent |
 | `tools/ctr/*.py`, `tools/progress_image.py` | `usa` → `jpn` in usage strings |
-| `tools/__init__.py`, `decompctx.py`, `ninja_syntax.py`, `tools/ctr/{check,elf,symbols,units}.py` | none beyond the line above |
+| `tools/__init__.py`, `decompctx.py`, `tools/ctr/{check,elf,symbols,units}.py` | none beyond the line above |
 | `notes/BUILD_SYSTEM.md` | from `docs/build_system.md`: NSMB2 facts removed or marked, changes of this project added |
 | `.editorconfig`, `.gitattributes`, `.clang-format`, `LICENSE` | none |
 
@@ -81,13 +81,20 @@ Source: the owner's DQMJ2 decompilation (`YggdrasziI/dqmj2-decomp`, CC0-1.0), co
 
 | Our file | Changes |
 |---|---|
-| `tools/report_diff.py` | dsd gap units (`_dsd_gap@`) replaced by automatic units (`auto/`) |
-| `tools/progress_badges.py` | regions, modules and overlays replaced by the progress categories of the report; default report `build/<version>/tracker/report.json` |
 | `tools/compiler_sweep.py` | rewritten for armcc and `code.bin` (same purpose as DQMJ2's, which drove mwccarm); reads another project's objects and flags through its `configure.py` |
-| `tools/asm_compare.py` | objdiff-cli from `build/tools/`; examples and wording for this project's units (`auto/` instead of dsd delinks); the objdiff call split into helpers shared with `why_diff.py` |
 | `tools/why_diff.py` | `--trace` (mwccarm coloring trace through `tools/mwcc_sched.py`) removed; `--objects` added; VFP registers (`sN`, `dN`) counted as registers; `add rN, pc, #imm` counted as a literal pool offset; the kinds marked as carried over from mwccarm |
 | `tools/unit_candidates.py` | rewritten for `code.bin`: functions outside every `splits.txt` range, calls from the relocations of the split objects; modules, overlays and fixed game regions removed; optional `--region` from `config.toml` |
 | `tools/permute.py` | armcc instead of mwccarm, with the unit's command from `build.ninja`; variants prelinked (`tools/ctr/prelink.py`) and compared with `build/<version>/delink/`; the word scorer reads objects with `tools/ctr/elf.py`; the `__typeof__` mutations removed (armcc rejects `__typeof__` with this project's flags); loop counters use `unsigned int` instead of `u32`; finds methods defined in their class body |
+
+## Shared tools (`tools/common/`)
+
+Git submodule [YggdrasziI/decomp-tools](https://github.com/YggdrasziI/decomp-tools)
+(the owner's, **CC0-1.0**; its `ninja_syntax.py` is from the Ninja project,
+**Apache-2.0**, notice and license kept there), added on 2026-11-23 in place of this
+project's copies of `asm_compare.py`, `report_diff.py`, `progress_badges.py` and
+`ninja_syntax.py`. What those copies had more (the objdiff call helpers that
+`why_diff.py` imports, the card rows from the report's progress categories and its
+own report path) went into decomp-tools first. Settings: `decomp.toml`.
 
 ## Own scripts
 

@@ -28,11 +28,13 @@ others (writing `push_back`'s test as `_size >= _allocated` broke 17 matched fun
 that `#include "..."` looks in the including file's directory first, so a changed header must
 replace the original in a copy of the whole directory, not shadow it with `-I`.
 
-Tools: `tools/asm_compare.py` (one function side by side with the original),
+Tools: `tools/common/asm_compare.py` (one function side by side with the original),
+`tools/common/try_unit.py` (one copy of a source file compiled, prelinked and scored
+outside the build),
 `tools/why_diff.py` (differing rows sorted into register, stack, moved and code
 differences) and `tools/permute.py` (random search over source forms of one function;
 a heuristic whose mutations come from mwccarm work, and only a score of 0 counts, with
-`tools/report_diff.py` and `ninja` as the proof). `tools/reloc_names.py` names the `fn_`/`lbl_` symbols that matched functions call or
+`tools/common/report_diff.py` and `ninja` as the proof). `tools/reloc_names.py` names the `fn_`/`lbl_` symbols that matched functions call or
 refer to, from the same relocation in our object (same offset, type and addend).
 BigRed's notes on what armlink did to the
 code (`notes/BUILD_SYSTEM.md`, "What the linker did to the code") come first when a

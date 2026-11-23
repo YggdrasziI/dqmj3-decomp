@@ -11,7 +11,7 @@ established, so a search can find nothing even when a match exists.
 
 Variants live in a temporary directory: the repository is never written. A result
 counts only when the bytes equal the target (`score` 0), and then
-`python tools/report_diff.py` and `ninja` remain the proof. The output form is a
+`python tools/common/report_diff.py` and `ninja` remain the proof. The output form is a
 compiler fact, not evidence of the original source.
 
   python tools/permute.py <unit> <symbol> [--seconds N] [--workers N] [--out DIR]

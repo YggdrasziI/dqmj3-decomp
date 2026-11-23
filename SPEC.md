@@ -127,7 +127,7 @@ Evidence and the candidate analysis go in `notes/COMPILER.md`. How the build wor
 ## Layout
 
 ```
-README.md SPEC.md LICENSE LICENSES/   CC0-1.0; Apache-2.0 for tools/ninja_syntax.py;
+README.md SPEC.md LICENSE LICENSES/   CC0-1.0;
                                       zlib for libs/squirrel/, libs/zlib/ and
                                       libs/zlib-1.2.5/
                                       (notes/PROVENANCE.md)

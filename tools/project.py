@@ -21,6 +21,7 @@ from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
+sys.path.insert(0, str(Path(__file__).resolve().parent / "common"))
 
 import ninja_syntax
 from ctr.image import VersionConfig
@@ -471,7 +472,7 @@ def generate_build_ninja(
             implicit=[
                 "configure.py",
                 unix(config.tools_dir / "project.py"),
-                unix(config.tools_dir / "ninja_syntax.py"),
+                unix(config.tools_dir / "common" / "ninja_syntax.py"),
                 unix(ctr / "units.py"),
                 unix(ctr / "symbols.py"),
                 unix(ctr / "image.py"),

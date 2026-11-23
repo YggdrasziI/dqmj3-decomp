@@ -247,7 +247,7 @@ config.progress_categories = [
     ProgressCategory("unknown", "Unidentified"),
 ]
 
-config.progress_image_title = None  # badges are drawn by tools/progress_badges.py
+config.progress_image_title = None  # badges are drawn by tools/common/progress_badges.py
 
 if args.mode == "configure":
     # Write build.ninja and objdiff.json

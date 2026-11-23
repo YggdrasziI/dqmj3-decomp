@@ -29,7 +29,7 @@ Usage:
   python tools/why_diff.py <unit> <symbol> [--rows]
   python tools/why_diff.py --objects <original.o> <ours.o> <symbol> [--rows]
 
-Unit names as in tools/asm_compare.py (objdiff's, e.g. game/FieldScriptFunc).
+Unit names as in tools/common/asm_compare.py (objdiff's, e.g. game/FieldScriptFunc).
 With --objects any two ELF objects are compared, e.g. a scratch variant against
 the split original in build/jpn/delink/.
 """
@@ -41,7 +41,7 @@ import sys
 from collections import Counter, defaultdict
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-sys.path.insert(0, os.path.join(ROOT, "tools"))
+sys.path.insert(0, os.path.join(ROOT, "tools", "common"))
 import asm_compare  # noqa: E402
 
 REG = re.compile(r"\b(r\d+|sp|lr|pc|ip|s\d+|d\d+)\b")

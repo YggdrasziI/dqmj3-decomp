@@ -38,7 +38,7 @@ Progress
 - **Linked**: code built from source (`Matching` units of `configure.py`).
 
 The badges and the card are drawn from the objdiff report by
-`tools/progress_badges.py`. After a build, `python tools/progress_badges.py --record`
+`tools/common/progress_badges.py`. After a build, `python tools/common/progress_badges.py --record`
 redraws `progress/jpn/` and adds the current commit to `progress/jpn/history.csv`.
 
 Dependencies
