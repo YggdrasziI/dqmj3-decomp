@@ -155,6 +155,7 @@ config.libs = [
         "objects": [
             Object(NonMatching, "game/BattleScriptFunc.cpp"),
             Object(NonMatching, "game/FieldScriptFunc.cpp"),
+            Object(Matching, "game/unit_00252D54.cpp"),
         ],
     },
     {

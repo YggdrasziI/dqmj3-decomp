@@ -92,6 +92,9 @@ game/FieldScriptFunc.cpp:
 	.text       start:0x0025D0A0 end:0x0025D13C
 	.rodata     start:0x00724B18 end:0x00725871
 
+game/unit_00252D54.cpp:
+	.text       start:0x00252D54 end:0x00252D70
+
 squirrel/sqapi.cpp:
 	.text       start:0x00141E40 end:0x00141F2C
 	.text       start:0x00154380 end:0x00154A24
