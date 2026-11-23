@@ -19,6 +19,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          submodules: true
 
       - name: Prepare
         run: cp /extract/code_${{ matrix.version }}.bin orig/${{ matrix.version }}/code.bin
