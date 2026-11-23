@@ -1,0 +1,46 @@
+# Project settings read by the tools of tools/common (see tools/common/decomp_config.py)
+
+title = "Dragon Quest Monsters: Joker 3"
+
+# First one is the default version
+versions = [
+    "jpn",  # CTR-P-BJ3J, remaster 0
+]
+
+[paths]
+# objdiff-cli is downloaded by the build (configure.py)
+objdiff_cli = "build/tools/objdiff-cli"
+# build/<version>/report.json is the report after tools/ctr/report_accounting.py
+# (the regression gate reads it); the progress card reads objdiff's own report
+progress_report = "build/{version}/tracker/report.json"
+
+# Compiler of the game library (src/game): ARM Compiler 5.04 b82, downloaded by the
+# build. The libraries use RVCT 4.1 builds 921 and 1049 (configure.py,
+# notes/COMPILER.md). Same flags as cflags_base of configure.py, without the
+# include paths.
+[compiler]
+path = "build/compilers/5.04/b82/bin/armcc.exe"
+flags = "--cpp --arm --cpu=MPCore --fpmode=fast --apcs=/interwork --split_sections -O3 -Otime --no_rtti --no_rtti_data --signed_chars"
+
+# tools/common/report_diff.py: automatic units (tools/ctr/units.py), the code no
+# source file claims yet
+[report]
+auto_units = ["auto/"]
+
+# tools/common/try_unit.py: one game source compiled outside the build, prepared
+# by tools/ctr/prelink.py as the build does (what armlink changed in calls), then
+# scored against the original object of its unit (piece = the unit name in
+# splits.txt without the extension, e.g. game/FieldScriptFunc)
+[try]
+compile = "{cc} {flags} -Iinclude -Isrc -Jbuild/compilers/5.04/b82/include -c {src} -o {obj}"
+then = "{python} tools/ctr/prelink.py config/{version}/config.toml --unit {piece}{suffix} {obj} -o {obj}"
+target = "build/{version}/delink/{piece}.o"
+
+# The card's rows are the progress categories of configure.py, from the report
+[progress]
+rows = "categories"
+
+# tools/common/check_traces.py (pre-commit and commit-msg hooks): the README's
+# disclosure line
+[traces]
+allow = ["decompile this for me"]
